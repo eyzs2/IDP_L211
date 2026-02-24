@@ -1,0 +1,32 @@
+
+rack array = [[0,0],[0,0]] [[A bot, A top], [B bot, B top]]
+- track which racks have been visited (rack[m][n] += 1)
+
+track which branch the robot is in (A/B)
+
+unloading bay int (0,1,2,3) blue green red yellow
+
+
+- line detection
+    - if both are ON, continue
+    - if one is OFF, correct in direction of ON
+- junction logic
+    - if either rear sensor is ON, turn that way until both front are ON
+    - if both rear ON (stop line/t-junction) go based on hardcoded instructions 
+- reel detection
+    - if forward sensor detects reel, ignore other racks (rack[m][n] = 6), grabber logic
+        - reel identification (resistance detection)
+            - based on reel picked up, determine which unloading bay to return to (by resistance)
+    - if reel not detected, increment rack[m][n] += 1
+
+- reel return logic (loading bay as input)
+    - grabber true, 
+
+- pathfinding logic
+    - at start, go forward until line is found
+    - once line is found, turn junction based on rack completion 
+        - if (sum(rack[0]) == 12), turn right
+        - else turn left
+    - follow line, turning at each rack junction
+    - enter rack line, reel detection 
+        - reel return logic
