@@ -4,20 +4,26 @@ rack array = [[0,0],[0,0]] [[A bot, A top], [B bot, B top]]
 
 track which branch the robot is in (A/B)
 
-unloading bay int (0,1,2,3) blue green red yellow
+6 boxes in each rack -> [0, 1, 2, 3, 4, 5]
+
+unloading bay int (0,1,2,3) blue -> green -> yellow -> red
 
 
-- line detection
-    - if both are ON, continue
-    - if one is OFF, correct in direction of ON
+- line detection (narrow trapezium)
+    - if both front are ON, continue until one rear is ON
+    - if one front is OFF, correct in direction of ON
+
 - junction logic
-    - if either rear sensor is ON, turn that way until both front are ON
+    - if either rear sensor is ON (ignore other rear), turn that way until same rear reengages as ON (fronts remain always ON)
     - if both rear ON (stop line/t-junction) go based on hardcoded instructions 
+
 - reel detection
-    - if forward sensor detects reel, ignore other racks (rack[m][n] = 6), grabber logic
+    - check every box using grabbers
+    - if reel not detected, increment rack[m][n] += 1 and continue 
+    - if grabbers find reel, ignore other racks (rack[m][n] = 6), grabber logic
         - reel identification (resistance detection)
             - based on reel picked up, determine which unloading bay to return to (by resistance)
-    - if reel not detected, increment rack[m][n] += 1
+            - continue to next rack
 
 - reel return logic (loading bay as input)
     - grabber true, 
