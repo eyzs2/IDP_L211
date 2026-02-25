@@ -14,7 +14,7 @@
 print("Welcome to main.py!")
 
 # Uncomment the test to run
-# test_led()
+test_led()
 # test_led_pwm()
 # test_input_poll()
 # test_motor3()
