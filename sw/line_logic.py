@@ -8,8 +8,9 @@ def onLine():
     rightonLine = Pin(rightonLinePin, Pin.IN, Pin.PULL_DOWN)
     rightonLine.irq(handler=offLine)
 
-def offLine():
-    pass
+def offLine(p):
+    value = p.value()
+    print(f"Input changed, value={value}")
 
 
     

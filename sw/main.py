@@ -1,4 +1,4 @@
-# from test_led import test_led
+from test_led import test_led
 # from test_pwm import test_pwm
 # from test_input import test_input_poll
 # from test_motor import test_motor3
