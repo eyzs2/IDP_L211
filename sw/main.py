@@ -28,3 +28,29 @@ print("Welcome to main.py!")
 # test_tiny_code_reader()
 
 print("main.py Done!")
+
+
+from your_line_module import LineSensor
+from startfinish_box import BlackBoxManager
+
+# motor is your existing list: motor[0]=left, motor[1]=right
+line = LineSensor(leftOnPin=26, rightOnPin=27, leftTurnPin=..., rightTurnPin=...)
+bb = BlackBoxManager(line_sensor=line, motor=motor)
+
+# 1) EXIT BLACK BOX
+while True:
+    if bb.exit_start_box():
+        break
+
+# 2) NOW DO NORMAL LINE FOLLOW (teammate code)
+loop = "A"   # or whatever you use
+# ... run mission
+while True:
+    line.lineFollow(motor=motor, loop=loop)
+    # switch to RETURN state when mission complete, etc.
+
+# 3) RETURN HOME (during return loop)
+while True:
+    line.lineFollow(motor=motor, loop=loop)
+    if bb.return_to_box_and_stop():
+        break

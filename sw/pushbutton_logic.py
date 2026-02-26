@@ -15,7 +15,7 @@ last_button_state = 0    # Start condition
 def reset():
     led.value(0) # Pressing button again resets robot and turns off LED
 
-    # Add code here to determine what we want resetting (memory of racks etc.)
+    # ADD CODE HERE to determine what we want resetting (memory of racks etc.)
 
     print("Reset complete")
 
