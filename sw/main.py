@@ -1,56 +1,56 @@
-from test_led import test_led
-# from test_pwm import test_pwm
-# from test_input import test_input_poll
-# from test_motor import test_motor3
-# from test_linear_actuator import test_actuator1
-# from test_tcs3472 import test_tcs3472
-# from test_vl53l0x import test_vl53l0x
-# from test_mfrc522 import test_mfrc522
-# from test_TMF8x01_get_distance import test_TMF8x01_get_distance
-# from test_STU_22L_IO_Mode import test_STU_22L_IO_Mode
-# from test_STU_22L_UART import test_STU_22L_UART
-# from test_tiny_code_reader import test_tiny_code_reader
+from utime import sleep_ms
 
-print("Welcome to main.py!")
+from line_logic import LineSensor
+from startfinish_box import BlackBoxController
+from test_motor import Motor 
 
-# Uncomment the test to run
-# test_led()
-# test_led_pwm()
-# test_input_poll()
-# test_motor3()
-# test_tcs3472()
-# test_actuator1()
-# test_vl53l0x()
-# test_mfrc522()
-# test_TMF8x01_get_distance()
-# test_STU_22L_IO_Mode()
-# test_STU_22L_UART()
-# test_tiny_code_reader()
+# change to actual pins once determined 
+LEFT_MOTOR_DIR = 4
+LEFT_MOTOR_PWM = 5
+RIGHT_MOTOR_DIR = 6
+RIGHT_MOTOR_PWM = 7
 
-print("main.py Done!")
+LEFT_ON_PIN = 26
+RIGHT_ON_PIN = 27
+LEFT_TURN_PIN = 28
+RIGHT_TURN_PIN = 29
 
+def main():
+    # Motors as we've defined: motor[0] = left, motor[1] = right
+    motor = [
+        Motor(dirPin=LEFT_MOTOR_DIR, PWMPin=LEFT_MOTOR_PWM),
+        Motor(dirPin=RIGHT_MOTOR_DIR, PWMPin=RIGHT_MOTOR_PWM),
+    ]
 
-from your_line_module import LineSensor
-from startfinish_box import BlackBoxManager
+    # Line sensor object (from line_logic)
+    line = LineSensor(
+        leftOnPin=LEFT_ON_PIN,
+        rightOnPin=RIGHT_ON_PIN,
+        leftTurnPin=LEFT_TURN_PIN,
+        rightTurnPin=RIGHT_TURN_PIN
+    )
 
-# motor is your existing list: motor[0]=left, motor[1]=right
-line = LineSensor(leftOnPin=26, rightOnPin=27, leftTurnPin=..., rightTurnPin=...)
-bb = BlackBoxManager(line_sensor=line, motor=motor)
+    # Start-box controller (from startfinish_box logic)
+    bb = BlackBoxController(
+        line_sensor=line,
+        motor=motor,
+        exit_speed=35,
+        confirm_ms_start=100
+    )
 
-# 1) EXIT BLACK BOX
-while True:
-    if bb.exit_start_box():
-        break
+    # step 1 - EXIT BLACK BOX
+    while True:
+        if bb.step_start_exit():   # returns True when both front sensors are white (debounced)
+            break
 
-# 2) NOW DO NORMAL LINE FOLLOW (teammate code)
-loop = "A"   # or whatever you use
-# ... run mission
-while True:
-    line.lineFollow(motor=motor, loop=loop)
-    # switch to RETURN state when mission complete, etc.
+    # small pause to prevent overshoot
+    sleep_ms(50)
 
-# 3) RETURN HOME (during return loop)
-while True:
-    line.lineFollow(motor=motor, loop=loop)
-    if bb.return_to_box_and_stop():
-        break
+    # step 2 - LINE FOLLOW LOOP
+    loop_id = "A"  # change name to whatever we decide for reel detection mode
+    while True:
+        line.lineFollow(motor=motor, loop=loop_id)
+        sleep_ms(10)  # optional, prevents maxing the CPU
+
+if __name__ == "__main__":
+    main()
