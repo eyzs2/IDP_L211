@@ -20,7 +20,7 @@ class LineSensor:
         # self.rightOn.irq(handler=offLine, trigger=Pin.IRQ_FALLING)
         
 
-    def lineFollow(self, motor): # define 0 left, 1 right
+    def lineFollow(self, motor, loop): # define 0 left, 1 right
         # Takes in Motor list argument for correction
 
         lineSense = self.lineSense
@@ -35,19 +35,20 @@ class LineSensor:
                     motor[(i+1)%2].off()
                     sleep(0.1)
         
-        self.turnLogic(motor=motor)
+        self.turnLogic(motor=motor, loop=loop)
 
         motor[0].Forward()
         motor[1].Forward()
             
         
 
-    def turnLogic(self, motor):
+    def turnLogic(self, motor, loop):
+
         turnSense = self.turnSense
 
         if turnSense[0] and turnSense[1]:
             # T junction, hardcode based on loop A/B
-        return
+            return
                 
         # TODO
         # if either turn sensor is off , sleep 0.2s, test again

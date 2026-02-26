@@ -8,44 +8,46 @@ track which branch the robot is in (A/B)
 
 unloading bay int (0,1,2,3) blue -> green -> yellow -> red
 
-
-- pathfinding logic
-    - at start, go forward until line is found
-    - once line is found, turn junction based on rack completion 
-        - if (sum(rack[0]) == 12), turn right
-        - else turn left
-    - follow line, turning at each rack junction
-    - enter rack line, reel detection 
-        - reel return logic
-
 - reset logic
     - pushbutton for hard reset
-    - microswitch for soft reset (back to start position but retains memory)
+    # - microswitch for soft reset (back to start position but retains memory)
 
-- line detection (narrow trapezium)
-    - if both front are ON, continue until one rear is ON
-    - if one front is OFF, correct in direction of ON
+- pathfinding loop
+    - pathfinding logic
+        - at start, go forward until line is found
+        - once line is found, turn junction based on rack completion 
+            - if (sum(rack[0]) == 12), turn right
+            - else turn left
+        - follow line, turning at each rack junction
+        - enter rack line, reel detection 
+            - reel return logic
 
-- junction logic
-    - if either rear sensor is ON (ignore other rear), turn that way until same rear reengages as ON (fronts remain always ON)
-    - if both rear ON (stop line/t-junction) go based on hardcoded instructions 
+    - line detection (narrow trapezium)
+        - if both front are ON, continue until one rear is ON
+        - if one front is OFF, correct in direction of ON
 
-- reel detection
-    - use distance sensor on side of chassis to check each box before turning
-    - if output is HIGH, initiate turn 
-    - if output is LOW, increment rack[m][n] += 1 and continue
-    - as a safety redundancy:
-        - check every box using grabbers
-        - if reel not detected, increment rack[m][n] += 1 and continue 
-        - if grabbers find reel, ignore other racks (rack[m][n] = 6), grabber logic
+    - junction logic
+        - if either rear sensor is ON (ignore other rear), turn that way until same rear reengages as ON (fronts remain always ON)
+        - if both rear ON (stop line/t-junction) go based on hardcoded instructions 
 
-- reel identification (resistance detection)
-    - based on reel picked up, determine which unloading bay to return to (by resistance)
-    - continue to next rack
+reel detect loop
+    - reel detection
+        - use distance sensor on side of chassis to check each box before turning
+        - if output is HIGH, initiate turn 
+        - if output is LOW, increment rack[m][n] += 1 and continue
+        - as a safety redundancy:
+            - check every box using grabbers
+            - if reel not detected, increment rack[m][n] += 1 and continue 
+            - if grabbers find reel, ignore other racks (rack[m][n] = 6), grabber logic
 
-- reel return logic (loading bay as input)
-    - tell grabbers where to drop based on reel resistance
-    - hard code direction instruction to each colour of loading bay
-    - start again continuing to next rack 
+pickup/unload loop
+    - reel identification (resistance detection)
+        - based on reel picked up, determine which unloading bay to return to (by resistance)
+        - continue to next rack
+
+    - reel return logic (loading bay as input)
+        - tell grabbers where to drop based on reel resistance
+        - hard code direction instruction to each colour of loading bay
+        - start again continuing to next rack 
 
 
