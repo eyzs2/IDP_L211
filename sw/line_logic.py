@@ -41,7 +41,7 @@ class LineSensor:
                 motors[loop].Reverse()
                 motors[(loop+1)%2].Forward()
                 while not (self.turnSense[loop].value() and lineSense[LEFT].value() and lineSense[RIGHT].value()): 
-                    #i.e. wait until turn sensor back ON, both line sensors back on line
+                    # i.e. wait until turn sensor back ON, both line sensors back on line
                     # do testing to determine reverse/forward values to complete turn and fulfil sensor criteria
                     sleep(0.01)
                     continue
