@@ -40,7 +40,7 @@ class LineSensor:
                 sleep(0.5)
             
         if turnDetection != NO_TURN:
-            if turnDetection == T:
+            if turnDetection == T or turnDetection == loop:
                 # execute turn based on predetermined outcome (loop)
                 motors[loop].Reverse()
                 motors[(loop+1)%2].Forward()
@@ -51,18 +51,19 @@ class LineSensor:
                     continue
 
 
-            else:
-                currentTurn = turnDetection
-                # pivot about centre, inner turn wheel reverse, outer turn forward
-                motors[currentTurn].Reverse()
-                motors[(currentTurn+1)%2].Forward()
-                while self.turnSense[currentTurn].value():
+            # elif turnDetection == loop:
+            #     # pivot about centre, inner turn wheel reverse, outer turn forward
+            #     motors[turnDetection].Reverse()
+            #     motors[(currentTurn+1)%2].Forward()
+            #     while self.turnSense[currentTurn].value():
+            #         continue
+            #     while not (self.turnSense[currentTurn].value() and lineSense[LEFT].value() and lineSense[RIGHT].value()): 
+            #         #i.e. wait until turn sensor back ON, both line sensors back on line
+            #         #TEST do testing to determine reverse/forward values to complete turn and fulfil sensor criteria
+            #         sleep(0.01)
                     continue
-                while not (self.turnSense[currentTurn].value() and lineSense[LEFT].value() and lineSense[RIGHT].value()): 
-                    #i.e. wait until turn sensor back ON, both line sensors back on line
-                    #TEST do testing to determine reverse/forward values to complete turn and fulfil sensor criteria
-                    sleep(0.01)
-                    continue
+            # stop after turn completion
+
             motors[LEFT].off()
             motors[RIGHT].off()
             sleep(1.0)
@@ -96,17 +97,10 @@ class LineSensor:
         return NO_TURN
 
 
-
-
-    
-                
         # TODO
         # if either turn sensor is off , sleep 0.2s, test again
         # if one still off, execute turn logic based on sensor
         # if both off, execute hardcoded t-junction logic
 
-    def reelDetectMode(self, loop):
-        if self.turnLogic == T:
-            return True
 
 

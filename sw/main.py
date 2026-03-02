@@ -1,5 +1,7 @@
 from machine import Pin
 from utime import sleep, ticks_ms, ticks_diff
+from test_motor import Motor
+
 
 from line_logic import LineSensor
 from start_box import exit_start_box
@@ -9,7 +11,7 @@ LEFT = 0
 RIGHT = 1
 
 MODE = "A"  # "A" = left at first T then rights after, "B" = right at first T then lefts after.
-loop_mode = 0 if MODE == "A" else 1
+loop_mode = 1 if MODE == "A" else 0
 
 # change to actual pins
 BUTTON_PIN = 12
