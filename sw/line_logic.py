@@ -97,10 +97,6 @@ class LineSensor:
         return NO_TURN
 
 
-
-
-    
-                
         # TODO
         # if either turn sensor is off , sleep 0.2s, test again
         # if one still off, execute turn logic based on sensor
