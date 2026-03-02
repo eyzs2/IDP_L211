@@ -15,8 +15,9 @@ RIGHT_ON_PIN = 27
 LEFT_TURN_PIN = 28
 RIGHT_TURN_PIN = 29
 
-A = 0
-B = 1
+# Loop definition
+A = 1
+B = 0
 
 def main():
     # Motors as we've defined: motor[0] = left, motor[1] = right
