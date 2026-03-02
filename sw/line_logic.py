@@ -3,10 +3,12 @@ from utime import sleep
 
 # Line functionality --> going on line from start box (initial state), staying on line (steady state), junction logic (interrupt)
 
+LEFT = 0
+RIGHT = 1
+NO_TURN = 2
+T = 3
 
-def offLine(p):
-    value = p.value()
-    print(f"Input changed, value={value}")
+
 
 class LineSensor:
     def __init__(self, leftOnPin, rightOnPin, leftTurnPin, rightTurnPin):
@@ -20,25 +22,55 @@ class LineSensor:
         # self.rightOn.irq(handler=offLine, trigger=Pin.IRQ_FALLING)
         
 
-    def lineFollow(self, motor, loop): # define 0 left, 1 right
+    def lineFollow(self, motors, loop): # define 0 left, 1 right
         # Takes in Motor list argument for correction
 
         lineSense = self.lineSense
+        turnDetection = self.turnLogic(motor=motors, loop=loop)
 
-        if not lineSense[0].value() and not lineSense[1].value():
-            motor[0].Reverse()
-            motor[1].Reverse()
-            sleep(0.5)
+        # lineSense is a list with left and right front sensors; lineSense[n].value() gives value of corresponding sensor
+        if not lineSense[LEFT].value() and not lineSense[RIGHT].value(): # End of junction/completely off line
+            if turnDetection == NO_TURN:
+                motors[LEFT].Reverse()
+                motors[RIGHT].Reverse()
+                sleep(0.5)
+            
+        if turnDetection != NO_TURN:
+            if turnDetection == T:
+                # execute turn based on predetermined outcome (loop)
+                motors[loop].Reverse()
+                motors[(loop+1)%2].Forward()
+                while not (self.turnSense[loop].value() and lineSense[LEFT].value() and lineSense[RIGHT].value()): 
+                    #i.e. wait until turn sensor back ON, both line sensors back on line
+                    # do testing to determine reverse/forward values to complete turn and fulfil sensor criteria
+                    sleep(0.01)
+                    continue
+            else:
+                currentTurn = turnDetection
+                # pivot about centre, inner turn wheel reverse, outer turn forward
+                motors[currentTurn].Reverse()
+                motors[(currentTurn+1)%2].Forward()
+                while self.turnSense[currentTurn].value():
+                    continue
+                while not (self.turnSense[currentTurn].value() and lineSense[LEFT].value() and lineSense[RIGHT].value()): 
+                    #i.e. wait until turn sensor back ON, both line sensors back on line
+                    # do testing to determine reverse/forward values to complete turn and fulfil sensor criteria
+                    sleep(0.01)
+                    continue
+            motors[LEFT].off()
+            motors[RIGHT].off()
+            sleep(1.0)
+
+
+           
         else: 
-            for i in range(len(lineSense)):
-                if not lineSense[i].value():
-                    motor[(i+1)%2].off()
-                    sleep(0.1)
-        
-        self.turnLogic(motor=motor, loop=loop)
+            for i in range(len(lineSense)): # If one sensor is off
+                if not lineSense[i].value() and turnDetection == NO_TURN:
+                    motors[(i+1)%2].off() # turn off opposite side motor to correct
+                    sleep(0.3)
 
-        motor[0].Forward()
-        motor[1].Forward()
+        motors[LEFT].Forward()
+        motors[RIGHT].Forward()
             
         
 
@@ -46,9 +78,23 @@ class LineSensor:
 
         turnSense = self.turnSense
 
-        if turnSense[0] and turnSense[1]:
-            # T junction, hardcode based on loop A/B
-            return
+        if turnSense[LEFT].value() and turnSense[RIGHT].value():
+            return T
+
+        for i in range(len(turnSense)):
+            if turnSense[i].value() and not turnSense[(i+1)%2].value(): # If one side turn is detected, check again for T
+                sleep(0.2)
+                if turnSense[LEFT].value() and turnSense[RIGHT].value(): # Check for T
+                    return T
+                if turnSense[i].value():
+                    return i # else treat as corner
+            
+        return NO_TURN
+
+
+
+
+                    
                 
         # TODO
         # if either turn sensor is off , sleep 0.2s, test again
@@ -56,19 +102,5 @@ class LineSensor:
         # if both off, execute hardcoded t-junction logic
 
 
-# 
 
 
-
-# def Line():
-    # leftonLinePin = 26
-    # rightonLinePin = 27
-#     leftonLine = Pin(leftonLinePin, Pin.IN, Pin.PULL_DOWN)
-#     leftonLine.irq(handler=offLine)
-#     rightonLine = Pin(rightonLinePin, Pin.IN, Pin.PULL_DOWN)
-#     rightonLine.irq(handler=offLine)
-
-
-
-
-    

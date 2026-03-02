@@ -15,6 +15,9 @@ RIGHT_ON_PIN = 27
 LEFT_TURN_PIN = 28
 RIGHT_TURN_PIN = 29
 
+A = 0
+B = 1
+
 def main():
     # Motors as we've defined: motor[0] = left, motor[1] = right
     motor = [
@@ -47,9 +50,9 @@ def main():
     sleep_ms(50)
 
     # step 2 - LINE FOLLOW LOOP
-    loop_id = "A"  # change name to whatever we decide for reel detection mode
+    loop_id = A  # change name to whatever we decide for reel detection mode
     while True:
-        line.lineFollow(motor=motor, loop=loop_id)
+        line.lineFollow(motors=motor, loop=loop_id)
         sleep_ms(10)  # optional, prevents maxing the CPU
 
 if __name__ == "__main__":
