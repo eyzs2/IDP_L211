@@ -1,5 +1,7 @@
 from machine import Pin
 from utime import sleep, ticks_ms, ticks_diff
+from test_motor import Motor
+
 
 from line_logic import LineSensor
 from start_box import exit_start_box

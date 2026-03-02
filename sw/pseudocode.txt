@@ -15,12 +15,14 @@ i/o
     - reel sensor (left/right)
     - grabber servo (left/right, should be identical code for both)
     - wheel motor (left/right)
+    - LED (R/G/B/Y)
+    - push button
 
-for loop A(code: RIGHT)/B (code: LEFT) (with respective direction)
+for loop A(code: RIGHT) / B (code: LEFT) (with respective direction)
 
     for line follow --> T junction --> RIGHT/LEFT
     for reel sensor --> RIGHT/LEFT
-    
+
 
 
 
