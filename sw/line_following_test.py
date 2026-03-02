@@ -1,123 +1,146 @@
-# line_follow_test_main.py
-from machine import Pin
-from utime import sleep, ticks_ms, ticks_diff
+from utime import sleep
 
-from line_logic import LineSensor, LEFT, RIGHT, NO_TURN, T  
-
-
-BUTTON_PIN = 15  # <-- set to our push button GPIO
-
-# Sensor pins (choose from our wiring)
-LEFT_ON_PIN = 26
-RIGHT_ON_PIN = 27
-LEFT_TURN_PIN = 28
-RIGHT_TURN_PIN = 29
-
-# Motor pins (choose from our wiring)
-LEFT_MOTOR_DIR = 4
-LEFT_MOTOR_PWM = 5
-RIGHT_MOTOR_DIR = 6
-RIGHT_MOTOR_PWM = 7
-
-# Perimeter rule:
-# allow ONLY the 4 perimeter turns (rectangle corners), ignore all other turn detections.
-# Simplest: "take the first 4 *corner* turns we see, ignore the rest"
-# (If your track has more turn markers on the inside, this works well.)
-MAX_PERIMETER_TURNS = 4
+from line_logic import LineSensor, LEFT, RIGHT, NO_TURN, T
+from start_box import exit_start_box
 
 
-def wait_for_button_press(btn: Pin):
-    # assumes active-low with pull-up; if yours is active-high, flip condition.
-    while btn.value() == 1:
-        sleep(0.01)
-    # debounce
-    sleep(0.15)
-    while btn.value() == 0:
-        sleep(0.01)
+class TurnScheduler:
+    """ 
+    rules for the LINE FOLLOWING TEST:
+
+    1) Turn RIGHT at the first T junction.
+    2) Turn RIGHT at the next 2 right corner junctions defined by:
+         - both front sensors black
+         - rear-right sensor white
+    3) Then turn RIGHT at the 8th right-corner opportunity after that.
+    4) Then turn LEFT at the 2nd left-corner opportunity after that.
+    5) After that final left completes, drive forward for 0.5s ignoring sensors, then stop.
+    """
+
+    def __init__(self, line: LineSensor):
+        self.line = line
+
+        self.stage = 0
+        # 0: wait for first T
+        # 1: take next 2 right corners
+        # 2: count right corners, take on 8th
+        # 3: count left corners, take on 2nd
+        # 4: finished
+
+        # initialising counts
+        self.right_corners_taken = 0
+        self.right_corner_count_after_2 = 0
+        self.left_corner_count_after_8 = 0
+
+        self.lockout = False
+        self.final_drive_pending = False
+
+    def _front_both_black(self) -> bool:
+        return (self.line.leftOn.value() == 0) and (self.line.rightOn.value() == 0)
+
+    def _rear_right_white(self) -> bool:
+        return self.line.rightTurn.value() == 1
+
+    def _is_right_corner(self, detection) -> bool:
+        return (detection == RIGHT) and self._front_both_black() and self._rear_right_white()
+
+    def _is_left_corner(self, detection) -> bool:
+        # If you later want extra conditions (e.g. rear-left white), add them here.
+        return (detection == LEFT) and self._front_both_black()
+
+    def attach(self):
+        self._original_turnLogic = self.line.turnLogic
+        self.line.turnLogic = self.filtered_turnLogic
+
+    def filtered_turnLogic(self):
+        detection = self._original_turnLogic()
+
+        # clear lockout once no turn is detected anymore
+        if detection == NO_TURN:
+            self.lockout = False
+            return NO_TURN
+
+        # prevent double counting at the same physical junction
+        if self.lockout:
+            return NO_TURN
+
+        # Stage 0: first T junction -> allow T (direction determined by loop=RIGHT)
+        if self.stage == 0:
+            if detection == T:
+                self.lockout = True
+                self.stage = 1
+                return T
+            return NO_TURN
+
+        # Stage 1: take next 2 right corners
+        if self.stage == 1:
+            if self._is_right_corner(detection):
+                self.lockout = True
+                self.right_corners_taken += 1
+                if self.right_corners_taken >= 2:
+                    self.stage = 2
+                return RIGHT
+            return NO_TURN
+
+        # Stage 2: take RIGHT on the 8th right-corner after stage 1 completes
+        if self.stage == 2:
+            if self._is_right_corner(detection):
+                self.right_corner_count_after_2 += 1
+                if self.right_corner_count_after_2 == 8:
+                    self.lockout = True
+                    self.stage = 3
+                    return RIGHT
+            return NO_TURN
+
+        # Stage 3: take LEFT on the 2nd left-corner after the 8th right
+        if self.stage == 3:
+            if self._is_left_corner(detection):
+                self.left_corner_count_after_8 += 1
+                if self.left_corner_count_after_8 == 2:
+                    self.lockout = True
+                    self.stage = 4
+                    self.final_drive_pending = True
+                    return LEFT
+            return NO_TURN
+
+        # Stage 4: finished, suppress all turns
+        return NO_TURN
 
 
-def drive_out_of_black_box_until_on_line(line: LineSensor, motors, timeout_s=5):
-    start = ticks_ms()
-    while ticks_diff(ticks_ms(), start) < int(timeout_s * 1000):
-        # drive forward slowly
-        motors[LEFT].Forward(30)
-        motors[RIGHT].Forward(30)
+def _stop_motors(motors):
+    motors[LEFT].off()
+    motors[RIGHT].off()
 
-        if line.lineSense[LEFT].value() and line.lineSense[RIGHT].value():
-            motors[LEFT].off()
-            motors[RIGHT].off()
-            sleep(0.05)
+
+def run_line_following_test(motors, line: LineSensor):
+    """
+    Call this from main.py to run the test.
+    """
+
+    # 1) Exit start box
+    ok = exit_start_box(line, motors, speed=35, confirm_ms=120, timeout_ms=6000)
+    if not ok:
+        _stop_motors(motors)
+        return False
+
+    # 2) Install filtered turning schedule
+    scheduler = TurnScheduler(line)
+    scheduler.attach()
+
+    # 3) Follow the line; first T must be RIGHT so loop=RIGHT
+    loop = RIGHT
+
+    while True:
+        line.lineFollow(motors, loop=loop)
+
+        # After final left completes, lineFollow returns and we do the final drive
+        if scheduler.final_drive_pending:
+            scheduler.final_drive_pending = False
+
+            motors[LEFT].Forward()
+            motors[RIGHT].Forward()
+            sleep(0.5)  # ignore all sensors
+            _stop_motors(motors)
             return True
 
         sleep(0.01)
-
-    # timeout fail-safe
-    motors[LEFT].off()
-    motors[RIGHT].off()
-    return False
-
-
-def make_turn_filter(line: LineSensor, max_turns: int):
-    """
-    Returns a function that replaces line.turnLogic.
-    It will:
-      - allow a turn only for the first `max_turns` *corner* detections (LEFT or RIGHT)
-      - ignore T-junctions (returns NO_TURN for T)
-      - after turns are used up, suppress all turning
-    """
-    original_turnLogic = line.turnLogic
-    turns_taken = {"n": 0}
-
-    def filtered_turnLogic(motor, loop):
-        # Ask the original code what it thinks is happening
-        detection = original_turnLogic(motor, loop)
-
-        # Ignore T-junction logic entirely for this perimeter test
-        if detection == T:
-            return NO_TURN
-
-        # Corner detections are LEFT (0) or RIGHT (1)
-        if detection in (LEFT, RIGHT):
-            if turns_taken["n"] < max_turns:
-                turns_taken["n"] += 1
-                return detection
-            else:
-                return NO_TURN
-
-        return NO_TURN
-
-    return filtered_turnLogic
-
-
-def main():
-    button = Pin(BUTTON_PIN, Pin.IN, Pin.PULL_UP)
-    line = LineSensor(LEFT_ON_PIN, RIGHT_ON_PIN, LEFT_TURN_PIN, RIGHT_TURN_PIN)
-    motors = [
-        Motor(dirPin=LEFT_MOTOR_DIR, PWMPin=LEFT_MOTOR_PWM),
-        Motor(dirPin=RIGHT_MOTOR_DIR, PWMPin=RIGHT_MOTOR_PWM),
-    ]
-
-    # 1) Wait for button
-    wait_for_button_press(button)
-
-    # 2) Exit black box to reach the line
-    ok = drive_out_of_black_box_until_on_line(line, motors)
-    if not ok:
-        # couldn't find line: stop
-        motors[LEFT].off()
-        motors[RIGHT].off()
-        while True:
-            sleep(1)
-
-    # 3) Install the "ignore internal junctions" filter
-    line.turnLogic = make_turn_filter(line, MAX_PERIMETER_TURNS)
-
-    # 4) Follow line forever (or until you decide to stop)
-    loop = 0 
-    while True:
-        line.lineFollow(motors, loop)
-        sleep(0.01)
-
-
-if __name__ == "__main__":
-    main()

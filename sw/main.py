@@ -5,6 +5,7 @@ from test_motor import Motor
 
 from line_logic import LineSensor
 from start_box import exit_start_box
+from test_motor import Motor
 
 LEFT = 0
 RIGHT = 1
@@ -16,7 +17,17 @@ loop_mode = 0 if MODE == "A" else 1
 BUTTON_PIN = 12
 LED_PIN = 28
 
-# motor pins and sensor pins
+# motor pins and sensor pins (change to actual)
+LEFT_ON_PIN = 26
+RIGHT_ON_PIN = 27
+LEFT_TURN_PIN = 28
+RIGHT_TURN_PIN = 29
+
+LEFT_MOTOR_DIR = 4
+LEFT_MOTOR_PWM = 5
+RIGHT_MOTOR_DIR = 6
+RIGHT_MOTOR_PWM = 7
+
 
 button = Pin(BUTTON_PIN, Pin.IN, Pin.PULL_DOWN)
 led = Pin(LED_PIN, Pin.OUT)
@@ -37,7 +48,7 @@ def reset_memory():
 def wait_for_button():
     while button.value() == 0:
         sleep(0.01)
-    sleep(0.15)          # debounce
+    sleep(0.15)     # debounce
     while button.value() == 1:
         sleep(0.01)
 
