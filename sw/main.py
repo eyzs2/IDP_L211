@@ -9,7 +9,7 @@
 from machine import Pin
 from utime import sleep
 from test_motor import Motor
-from line_logic import LineSensor, LEFT, RIGHT
+from line_logic import LineSensor, LEFT, RIGHT, T, NO_TURN
 from start_box import exit_start_box
 
 
@@ -19,9 +19,6 @@ from reelsensor import ReelSensor
 
 MODE = "A"
 loop_mode = LEFT if MODE == "A" else RIGHT
-LEFT = 0
-RIGHT = 1
-T = 3
 
 # pin configs (need editing based on electrical teams decisions):
 
