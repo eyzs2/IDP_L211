@@ -1,83 +1,148 @@
+# actions:
+# 1) wait for push button press.
+# 2) reset stored memory.
+# 3) drive out of the start box until front sensors detect line.
+# 4) begin normal line-follow logic.
+# 5) if button pressed again during run, stop motors and restart from step 1.
+
+
 from machine import Pin
-from utime import sleep, ticks_ms, ticks_diff
+from utime import sleep
 from test_motor import Motor
-
-
-from line_logic import LineSensor
+from line_logic import LineSensor, LEFT, RIGHT
 from start_box import exit_start_box
-from test_motor import Motor
 
-LEFT = 0
-RIGHT = 1
 
-MODE = "A"  # "A" = left at first T then rights after, "B" = right at first T then lefts after.
-loop_mode = 1 if MODE == "A" else 0
+# Mode A = Turn LEFT at first T junction
+# Mode B = Turn RIGHT at first T junction
 
-# change to actual pins
+MODE = "A"
+loop_mode = LEFT if MODE == "A" else RIGHT
+
+# pin configs (need editing based on electrical teams decisions):
+
 BUTTON_PIN = 12
-LED_PIN = 28
+led = Pin("LED", Pin.OUT)
 
-# motor pins and sensor pins (change to actual)
+# Front line sensors
 LEFT_ON_PIN = 26
 RIGHT_ON_PIN = 27
+
+# Rear line sensors
 LEFT_TURN_PIN = 28
 RIGHT_TURN_PIN = 29
 
+# Motor pins
 LEFT_MOTOR_DIR = 4
 LEFT_MOTOR_PWM = 5
 RIGHT_MOTOR_DIR = 6
 RIGHT_MOTOR_PWM = 7
 
 
+# Push button (active HIGH with PULL_DOWN)
 button = Pin(BUTTON_PIN, Pin.IN, Pin.PULL_DOWN)
-led = Pin(LED_PIN, Pin.OUT)
 
-line = LineSensor(leftOnPin=LEFT_ON_PIN, rightOnPin=RIGHT_ON_PIN,
-                  leftTurnPin=LEFT_TURN_PIN, rightTurnPin=RIGHT_TURN_PIN)
+# Line sensor object (from line_logic.py)
+line = LineSensor(
+    leftOnPin=LEFT_ON_PIN,
+    rightOnPin=RIGHT_ON_PIN,
+    leftTurnPin=LEFT_TURN_PIN,
+    rightTurnPin=RIGHT_TURN_PIN
+)
 
+# Motor objects
 motors = [
     Motor(dirPin=LEFT_MOTOR_DIR, PWMPin=LEFT_MOTOR_PWM),
     Motor(dirPin=RIGHT_MOTOR_DIR, PWMPin=RIGHT_MOTOR_PWM),
 ]
 
+
+# memory variables to store state about the mission:
+
+racks_visited = []
+current_rack = None
+
+
+# helper functions
 def reset_memory():
+    # clears all stored mission data, called every time the button is pressed.
     global racks_visited, current_rack
+
+    print("Resetting robot memory...")
+
     racks_visited = []
     current_rack = None
 
-def wait_for_button():
+    print("Memory reset complete.")
+
+
+def stop_motors():
+    motors[LEFT].off()
+    motors[RIGHT].off()
+
+
+def wait_for_button_press():
+    # blocks until the push button is pressed, includes simple debounce protection.
+    
     while button.value() == 0:
         sleep(0.01)
-    sleep(0.15)     # debounce
+
+    sleep(0.15)  # debounce delay
+
     while button.value() == 1:
         sleep(0.01)
 
+
+# main program loop
+
 while True:
-    # 1) wait for press
-    wait_for_button()
 
-    # 2) reset
+    # 1) WAIT FOR BUTTON PRESS TO START / RESTART
+    wait_for_button_press()
+
+    # 2) RESET MEMORY AND STOP MOTORS
     reset_memory()
+    stop_motors()
+    led.value(0)
 
-    # 3) exit start box
-    ok = exit_start_box(line, motors, speed=35)
-    if not ok:
-        # if could not find the line; stop and wait for another push button press
-        motors[LEFT].off()
-        motors[RIGHT].off()
-        continue
+    print("Starting robot from black box...")
 
-    # 4) now do line logic code for the rest
+    # 3) EXIT BLACK START BOX
+    # drives straight forward until BOTH front sensors detect the line.
+    # exit_start_box() returns:
+    # True for successfully found the line
+    # False for timeout / failure
+
+    success = exit_start_box(line, motors, speed=35)
+
+    if not success:
+        print("Failed to detect line. Waiting for restart.")
+        stop_motors()
+        continue   # go back to waiting for button
+
+
+    print("Line detected. Beginning line-following mode.")
+
+    # 4) NORMAL LINE FOLLOW MODE
+    # This continues until the button is pressed again.
+
     while True:
-        led.toggle()
+
+        # calling line-follow logic
         line.lineFollow(motors, loop=loop_mode)
 
-        # allows the button to cause stop and restart mid-run
+        # flash LED to indicate robot is active
+        led.toggle()
+
+        # Allow button press during run to restart system
         if button.value() == 1:
-            # break out to outer loop to reset + restart
-            sleep(0.15)
+
+            sleep(0.15)  # debounce
             while button.value() == 1:
                 sleep(0.01)
-            motors[LEFT].off()
-            motors[RIGHT].off()
-            break
+
+            print("Restart requested.")
+            stop_motors()
+            break   # exit inner loop and restart from top
+
+        sleep(0.01)
