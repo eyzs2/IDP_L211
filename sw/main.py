@@ -22,16 +22,16 @@ loop_mode = LEFT if MODE == "A" else RIGHT
 
 # pin configs (need editing based on electrical teams decisions):
 
-BUTTON_PIN = 12
+BUTTON_PIN = 15
 led = Pin("LED", Pin.OUT)
 
 # Front line sensors
-LEFT_ON_PIN = 26
-RIGHT_ON_PIN = 27
+LEFT_ON_PIN = 13
+RIGHT_ON_PIN = 12
 
 # Rear line sensors
 LEFT_TURN_PIN = 28
-RIGHT_TURN_PIN = 29
+RIGHT_TURN_PIN = 27
 
 # Motor pins
 LEFT_MOTOR_DIR = 4
@@ -39,8 +39,8 @@ LEFT_MOTOR_PWM = 5
 RIGHT_MOTOR_DIR = 6
 RIGHT_MOTOR_PWM = 7
 
-LEFT_REEL_SENSOR = 13
-RIGHT_REEL_SENSOR = 14
+LEFT_REEL_SENSOR = 0
+RIGHT_REEL_SENSOR = 0
 
 
 # Push button (active HIGH with PULL_DOWN)
