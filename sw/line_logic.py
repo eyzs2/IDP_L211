@@ -49,8 +49,6 @@ class LineSensor:
                     # do testing to determine reverse/forward values to complete turn and fulfil sensor criteria
                     sleep(0.01)
                     continue
-
-
             # elif turnDetection == loop:
             #     # pivot about centre, inner turn wheel reverse, outer turn forward
             #     motors[turnDetection].Reverse()
@@ -67,6 +65,15 @@ class LineSensor:
             motors[LEFT].off()
             motors[RIGHT].off()
             sleep(1.0)
+
+            while self.turnSense[LEFT].value() or self.turnSense[RIGHT].value(): #keep moving forward until straight line sense is restored ie no turn detected
+                motors[LEFT].Forward()
+                motors[RIGHT].Forward()
+            
+            motors[LEFT].off()
+            motors[RIGHT].off()
+            sleep(1.0)
+
 
 
            

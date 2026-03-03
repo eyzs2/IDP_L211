@@ -15,6 +15,7 @@ from start_box import exit_start_box
 
 # Mode A = Turn LEFT at first T junction
 # Mode B = Turn RIGHT at first T junction
+from reelsensor import ReelSensor
 
 MODE = "A"
 loop_mode = LEFT if MODE == "A" else RIGHT
@@ -41,6 +42,9 @@ LEFT_MOTOR_PWM = 5
 RIGHT_MOTOR_DIR = 6
 RIGHT_MOTOR_PWM = 7
 
+LEFT_REEL_SENSOR = 13
+RIGHT_REEL_SENSOR = 14
+
 
 # Push button (active HIGH with PULL_DOWN)
 button = Pin(BUTTON_PIN, Pin.IN, Pin.PULL_DOWN)
@@ -52,6 +56,8 @@ line = LineSensor(
     leftTurnPin=LEFT_TURN_PIN,
     rightTurnPin=RIGHT_TURN_PIN
 )
+
+reelsense = ReelSensor(leftReelSensorPin=LEFT_REEL_SENSOR, rightReelSensorPin=RIGHT_REEL_SENSOR)
 
 # Motor objects
 motors = [
@@ -134,10 +140,15 @@ while True:
         # calling line-follow logic
         line.lineFollow(motors, loop=loop_mode)
         if line.turnLogic == T:
+            if not reelsense.reelMode:
             #TODO enable reel detection mode based on loop
             #reelSensor.detect(loop=loop_mode)
             #grabberlogic
             #return logic
+                reelsense.reelMode = True
+                while reelsense.reelMode:
+                    reelsense.reelDetect(line, loop_mode, motors)
+
             print("lol")
 
         # flash LED to indicate robot is active
