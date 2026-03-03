@@ -18,6 +18,9 @@ from start_box import exit_start_box
 
 MODE = "A"
 loop_mode = LEFT if MODE == "A" else RIGHT
+LEFT = 0
+RIGHT = 1
+T = 3
 
 # pin configs (need editing based on electrical teams decisions):
 
@@ -130,6 +133,12 @@ while True:
 
         # calling line-follow logic
         line.lineFollow(motors, loop=loop_mode)
+        if line.turnLogic == T:
+            #TODO enable reel detection mode based on loop
+            #reelSensor.detect(loop=loop_mode)
+            #grabberlogic
+            #return logic
+            print("lol")
 
         # flash LED to indicate robot is active
         led.toggle()
