@@ -41,12 +41,15 @@ class TurnScheduler:
     def _rear_right_white(self) -> bool:
         return self.line.rightTurn.value() == 1
 
+    def _rear_left_white(self) -> bool:
+        return self.line.leftTurn.value() == 1
+
     def _is_right_corner(self, detection) -> bool:
         return (detection == RIGHT) and self._front_both_black() and self._rear_right_white()
 
     def _is_left_corner(self, detection) -> bool:
         # If you later want extra conditions (e.g. rear-left white), add them here.
-        return (detection == LEFT) and self._front_both_black()
+        return (detection == LEFT) and self._rear_left_white()
 
     def attach(self):
         self._original_turnLogic = self.line.turnLogic
