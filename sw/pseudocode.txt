@@ -24,10 +24,6 @@ for loop A(code: RIGHT) / B (code: LEFT) (with respective direction)
     for reel sensor --> RIGHT/LEFT
 
 
-
-
-
-
 - reset logic
     - pushbutton for hard reset
     # - microswitch for soft reset (back to start position but retains memory)
@@ -52,6 +48,7 @@ for loop A(code: RIGHT) / B (code: LEFT) (with respective direction)
 
 reel detect loop
     - on first T --> activate reel detection loop until second T (stop line)
+        - interrupt on T via line.turnLogic()
     - reel detection
         - use distance sensor on side of chassis to check each box before turning
         - if output is HIGH, initiate turn 

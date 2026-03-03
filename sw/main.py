@@ -9,6 +9,7 @@ from test_motor import Motor
 
 LEFT = 0
 RIGHT = 1
+T = 3
 
 MODE = "A"  # "A" = left at first T then rights after, "B" = right at first T then lefts after.
 loop_mode = 1 if MODE == "A" else 0
@@ -71,6 +72,12 @@ while True:
     while True:
         led.toggle()
         line.lineFollow(motors, loop=loop_mode)
+        if line.turnLogic == T:
+            #TODO enable reel detection mode based on loop
+            #reelSensor.detect(loop=loop_mode)
+            #grabberlogic
+            #return logic
+            print("lol")
 
         # allows the button to cause stop and restart mid-run
         if button.value() == 1:
