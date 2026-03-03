@@ -29,7 +29,7 @@ class ReelSensor:
             if line.turnLogic() == loop:
                 motors[LEFT].off()
                 motors(RIGHT).off()
-                if self.reelSensors[loop] > THRESHOLD_DIST:
+                if self.reelSensors[loop] < THRESHOLD_DIST:
                     # grabber logic
                     print("reel detected")
 
