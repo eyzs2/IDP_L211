@@ -39,8 +39,8 @@ RIGHT_TURN_PIN = 27
 # Motor pins
 LEFT_MOTOR_DIR = 4
 LEFT_MOTOR_PWM = 5
-RIGHT_MOTOR_DIR = 6
-RIGHT_MOTOR_PWM = 7
+RIGHT_MOTOR_DIR = 7
+RIGHT_MOTOR_PWM = 6
 
 # LEFT_REEL_SENSOR = 0
 # RIGHT_REEL_SENSOR = 0
@@ -147,4 +147,3 @@ while True:
             break # exit inner loop and restart from top
 
         sleep(0.01)
-        
