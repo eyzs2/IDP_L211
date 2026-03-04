@@ -11,6 +11,7 @@ from utime import sleep
 from test_motor import Motor
 from line_logic import LineSensor, LEFT, RIGHT, T, NO_TURN
 from start_box import exit_start_box
+from pushbutton_logic import ButtonEdge
 
 
 # Mode A = Turn LEFT at first T junction
@@ -18,7 +19,9 @@ from start_box import exit_start_box
 from reelsensor import ReelSensor
 
 MODE = "A"
-loop_mode = LEFT if MODE == "A" else RIGHT
+loop_mode = RIGHT if MODE == "A" else LEFT
+LEFT_MOTOR = 0
+RIGHT_MOTOR = 1
 
 # pin configs (need editing based on electrical teams decisions):
 
@@ -44,7 +47,8 @@ RIGHT_REEL_SENSOR = 0
 
 
 # Push button (active HIGH with PULL_DOWN)
-button = Pin(BUTTON_PIN, Pin.IN, Pin.PULL_DOWN)
+button = ButtonEdge(Pin(BUTTON_PIN, Pin.IN, Pin.PULL_DOWN), debounce_ms=150)
+
 
 # Line sensor object (from line_logic.py)
 line = LineSensor(
@@ -83,19 +87,12 @@ def reset_memory():
 
 
 def stop_motors():
-    motors[LEFT].off()
-    motors[RIGHT].off()
+    motors[LEFT_MOTOR].off()
+    motors[RIGHT_MOTOR].off()
 
 
 def wait_for_button_press():
-    # blocks until the push button is pressed, includes simple debounce protection.
-    
-    while button.value() == 0:
-        sleep(0.01)
-
-    sleep(0.15)  # debounce delay
-
-    while button.value() == 1:
+    while not button.pressed():
         sleep(0.01)
 
 
@@ -146,20 +143,17 @@ while True:
                 while reelsense.reelMode:
                     reelsense.reelDetect(line, loop_mode, motors)
 
-            print("lol")
+            print("not in reel mode")
 
         # flash LED to indicate robot is active
         led.toggle()
 
         # Allow button press during run to restart system
-        if button.value() == 1:
 
-            sleep(0.15)  # debounce
-            while button.value() == 1:
-                sleep(0.01)
-
+        # In the main loop, replace the inline button check:
+        if button.pressed():  # instead of: if button.value() == 1:
             print("Restart requested.")
             stop_motors()
-            break   # exit inner loop and restart from top
+            break # exit inner loop and restart from top
 
         sleep(0.01)
