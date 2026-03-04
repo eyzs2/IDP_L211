@@ -54,17 +54,10 @@ current_rack = None
 # Flag to signal immediate stop during line follow
 STOP_REQUESTED = False
 
-def on_button_press(pin):
-    """Interrupt handler: sets stop flag when button is pressed."""
-    global STOP_REQUESTED
-    STOP_REQUESTED = True
-
-
 # Push button (active HIGH with PULL_DOWN)
 button_pin = Pin(BUTTON_PIN, Pin.IN, Pin.PULL_DOWN)
 button = ButtonEdge(button_pin, debounce_ms=150)
 # Set up interrupt on button pin for immediate stop during run
-button_pin.irq(handler=on_button_press, trigger=Pin.IRQ_RISING)
 
 
 # Line sensor object (from line_logic.py)
