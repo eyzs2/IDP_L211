@@ -42,8 +42,8 @@ LEFT_MOTOR_PWM = 5
 RIGHT_MOTOR_DIR = 6
 RIGHT_MOTOR_PWM = 7
 
-LEFT_REEL_SENSOR = 0
-RIGHT_REEL_SENSOR = 0
+# LEFT_REEL_SENSOR = 0
+# RIGHT_REEL_SENSOR = 0
 
 
 # Push button (active HIGH with PULL_DOWN)
@@ -58,7 +58,7 @@ line = LineSensor(
     rightTurnPin=RIGHT_TURN_PIN
 )
 
-reelsense = ReelSensor(leftReelSensorPin=LEFT_REEL_SENSOR, rightReelSensorPin=RIGHT_REEL_SENSOR)
+# reelsense = ReelSensor(leftReelSensorPin=LEFT_REEL_SENSOR, rightReelSensorPin=RIGHT_REEL_SENSOR)
 
 # Motor objects
 motors = [
@@ -133,15 +133,15 @@ while True:
 
         # calling line-follow logic
         line.lineFollow(motors, loop=loop_mode)
-        if line.turnLogic == T:
-            if not reelsense.reelMode:
+        if line.turnLogic() == T:
+ #           if not reelsense.reelMode:
             #TODO enable reel detection mode based on loop
             #reelSensor.detect(loop=loop_mode)
             #grabberlogic
             #return logic
-                reelsense.reelMode = True
-                while reelsense.reelMode:
-                    reelsense.reelDetect(line, loop_mode, motors)
+ #               reelsense.reelMode = True
+  #              while reelsense.reelMode:
+   #                 reelsense.reelDetect(line, loop_mode, motors)
 
             print("not in reel mode")
 
