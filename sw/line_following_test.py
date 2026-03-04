@@ -7,7 +7,8 @@ class TurnScheduler:
     """ 
     rules for the LINE FOLLOWING TEST:
 
-    1) Turn LEFT at the first T junction.
+    1) Turn LEFT at first T
+    2) Turn RIGHT at second T
     2) Turn RIGHT at the next 2 right corner junctions defined by:
          - both front sensors black
          - rear-right sensor white
@@ -18,19 +19,8 @@ class TurnScheduler:
 
     def __init__(self, line: LineSensor):
         self.line = line
-
         self.stage = 0
-        # 0: wait for first T
-        # 1: take next 2 right corners
-        # 2: count right corners, take on 8th
-        # 3: count left corners, take on 2nd
-        # 4: finished
-
-        # initialising counts
-        self.right_corners_taken = 0
-        self.right_corner_count_after_2 = 0
-        self.left_corner_count_after_8 = 0
-
+        self.corner_taken = 0 
         self.lockout = False
         self.final_drive_pending = False
 
@@ -70,27 +60,24 @@ class TurnScheduler:
             if detection == T:
                 self.lockout = True
                 self.stage = 1
-                return T
+                return LEFT
             return NO_TURN
 
-        # Stage 1: take next 2 right corners
         if self.stage == 1:
+            if detection == T:
+                self.lockout = True
+                self.stage = 2
+                return RIGHT
+            return NO_TURN
+
+        if self.stage == 2:
             if self._is_right_corner(detection):
                 self.lockout = True
                 self.right_corners_taken += 1
                 if self.right_corners_taken >= 2:
-                    self.stage = 2
-                return RIGHT
-            return NO_TURN
-
-        # Stage 2: take RIGHT on the 8th right-corner after stage 1 completes
-        if self.stage == 2:
-            if self._is_right_corner(detection):
-                self.right_corner_count_after_2 += 1
-                if self.right_corner_count_after_2 == 8:
-                    self.lockout = True
+                    self.final_drive_pending = True
                     self.stage = 3
-                    return RIGHT
+                return RIGHT
             return NO_TURN
 
         # Stage 3: take LEFT on the 2nd left-corner after the 8th right
@@ -116,7 +103,7 @@ def _stop_motors(motors):
 def run_line_following_test(motors, line: LineSensor):
 
     # 1) Exit start box
-    ok = exit_start_box(line, motors, speed=35, confirm_ms=120, timeout_ms=6000)
+    ok = exit_start_box(line, motors, motorspeed=65, confirm_ms=120, timeout_ms=6000)
     if not ok:
         _stop_motors(motors)
         return False
@@ -126,17 +113,17 @@ def run_line_following_test(motors, line: LineSensor):
     scheduler.attach()
 
     # 3) Follow the line; first T must be RIGHT so loop=RIGHT
-    loop = LEFT
+    loop_mode = LEFT
 
     while True:
-        line.lineFollow(motors, loop=loop)
+        line.lineFollow(motors, loop=loop_mode)
 
         # After final left completes, lineFollow returns and we do the final drive
         if scheduler.final_drive_pending:
             scheduler.final_drive_pending = False
 
-            motors[LEFT].Forward()
-            motors[RIGHT].Forward()
+            motors[LEFT].Forward(LEFT, speed=75)
+            motors[RIGHT].Forward(RIGHT, speed=75)
             sleep(0.5)  # ignore all sensors
             _stop_motors(motors)
             return True
