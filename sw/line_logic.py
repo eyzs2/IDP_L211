@@ -46,8 +46,8 @@ class LineSensor:
             if turnDetection == T or turnDetection == loop:
                 # execute turn based on predetermined outcome (loop)
                 print("turning ", loop)
-                motors[loop].Reverse(speed=10)
-                motors[(loop+1)%2].Forward(speed=10)
+                motors[loop].Reverse(side=loop, speed=50)
+                motors[(loop+1)%2].Forward(side=(loop+1)%2, speed=50)
                 while not (self.turnSense[loop].value() and lineSense[LEFT].value() and lineSense[RIGHT].value()): 
                     # i.e. wait until turn sensor back ON, both line sensors back on line
                     # do testing to determine reverse/forward values to complete turn and fulfil sensor criteria
@@ -87,10 +87,9 @@ class LineSensor:
             for i in range(len(lineSense)): # If one sensor is off
                 if not lineSense[i].value() and turnDetection == NO_TURN:
                     print("correcting")
-                    motors[(i+1)%2].Forward(side=((i+1)%2),speed=40) # turn off opposite side motor to correct
-                    sleep(0.18) #TEST adjust based on tests
-                    motors[(i+1)%2].Forward(side=((i+1)%2),speed=80)
-                    
+                    while not lineSense[i].value():
+                        motors[(i+1)%2].Forward(side=((i+1)%2),speed=40) # turn off opposite side motor to correct
+                    sleep(0.05) #TEST adjust based on test
 
         motors[LEFT].Forward(side=LEFT, speed=80)
         motors[RIGHT].Forward(side=RIGHT, speed=80)
