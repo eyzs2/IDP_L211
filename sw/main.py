@@ -116,7 +116,7 @@ while True:
     # True for successfully found the line
     # False for timeout / failure
 
-    success = exit_start_box(line, motors, speed=35)
+    success = exit_start_box(line, motors, speed=65)
 
     if not success:
         print("Failed to detect line. Waiting for restart.")
@@ -133,17 +133,6 @@ while True:
 
         # calling line-follow logic
         line.lineFollow(motors, loop=loop_mode)
-        if line.turnLogic() == T:
- #           if not reelsense.reelMode:
-            #TODO enable reel detection mode based on loop
-            #reelSensor.detect(loop=loop_mode)
-            #grabberlogic
-            #return logic
- #               reelsense.reelMode = True
-  #              while reelsense.reelMode:
-   #                 reelsense.reelDetect(line, loop_mode, motors)
-
-            print("not in reel mode")
 
         # flash LED to indicate robot is active
         led.toggle()

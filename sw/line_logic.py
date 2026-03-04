@@ -28,7 +28,7 @@ class LineSensor:
 
         # once loop done, self.loopCompletion = True
         # Decided by if all racks are checked
-        print("starting lien follow")
+        print("starting line follow")
 
         lineSense = self.lineSense
         turnDetection = self.turnLogic()
