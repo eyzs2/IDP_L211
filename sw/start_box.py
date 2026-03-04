@@ -3,7 +3,7 @@ from utime import sleep, ticks_ms, ticks_diff
 LEFT = 0
 RIGHT = 1
 
-def exit_start_box(line, motors, motorspeed=35, confirm_ms=120, timeout_ms=6000):
+def exit_start_box(line, motors, motorspeed=30, confirm_ms=120, timeout_ms=2000):
 
     start_time = ticks_ms()
     confirm_start = None
@@ -27,7 +27,7 @@ def exit_start_box(line, motors, motorspeed=35, confirm_ms=120, timeout_ms=6000)
             elif ticks_diff(ticks_ms(), confirm_start) > confirm_ms:
                 print("Line confirmed. Exiting start box...")
                 drive_start = ticks_ms()
-                while ticks_diff(ticks_ms(), drive_start) < 1000:
+                while ticks_diff(ticks_ms(), drive_start) < 300:
                     motors[LEFT].Forward(LEFT, speed=motorspeed)
                     motors[RIGHT].Forward(RIGHT, speed=motorspeed)
                     sleep(0.01)

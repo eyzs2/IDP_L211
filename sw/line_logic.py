@@ -43,7 +43,6 @@ class LineSensor:
             
         if turnDetection != NO_TURN:
             print("turn detected")
-            sleep(0.02)
             if turnDetection == T or turnDetection == loop:
                 # execute turn based on predetermined outcome (loop)
                 print("turning ", "type: ", loop)
@@ -56,7 +55,7 @@ class LineSensor:
                 motors[(loop+1) % 2].Forward(side=(loop+1) % 2, speed=35)
 
                 # settle time: don't check sensors yet 
-                sleep(0.5)
+                sleep(0.3)
 
                 # wait until BOTH front sensors are back on the line
                 while not (lineSense[LEFT].value() == 1 and lineSense[RIGHT].value() == 1):
@@ -101,12 +100,12 @@ class LineSensor:
                                 return
                             motors[i].Forward(side=i, speed=60)  # retain other side speed
                             motors[opposite].Forward(side=opposite, speed=30)  # Reduced speed on opposite
-                            sleep(0.03)
+                            sleep(0.01)
                         break
 
         motors[LEFT].Forward(side=LEFT, speed=60)
         motors[RIGHT].Forward(side=RIGHT, speed=60)
-        sleep(0.1)
+        sleep(0.01)
 
     def turnLogic(self):
 
