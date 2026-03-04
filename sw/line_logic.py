@@ -50,7 +50,7 @@ class LineSensor:
                 # execute turn based on predetermined outcome (loop)
                 print("turning ", "type: ", loop)
                 # Stop motors briefly before pivoting
-                motors[loop].Reverse(side=loop, speed=35)  # change turn speed here as needed
+                motors[loop].Reverse(side=loop, speed=40)  # change turn speed here as needed
                 motors[(loop+1) % 2].Forward(side=(loop+1) % 2, speed=25)
 
                 # settle time: don't check sensors yet 

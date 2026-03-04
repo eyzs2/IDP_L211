@@ -28,15 +28,14 @@ def exit_start_box(line, motors, motorspeed=25, confirm_ms=120, timeout_ms=2000)
             elif ticks_diff(ticks_ms(), confirm_start) > confirm_ms:
                 print("Line confirmed. Exiting start box...")
                 drive_start = ticks_ms()
-                while ticks_diff(ticks_ms(), drive_start) < 300:
+                while ticks_diff(ticks_ms(), drive_start) < 800:
                     motors[LEFT].Forward(LEFT, speed=motorspeed)
                     motors[RIGHT].Forward(RIGHT, speed=motorspeed)
                     sleep(0.01)
 
                 motors[LEFT].off()
                 motors[RIGHT].off()
-                print("half second of straight complete, start line follow logic...")
-                sleep(0.5)
+                print("straight stint complete, start line follow logic...")
                 return True
         else:
             confirm_start = None

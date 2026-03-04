@@ -103,7 +103,7 @@ def _stop_motors(motors):
 def run_line_following_test(motors, line: LineSensor):
 
     # 1) Exit start box
-    ok = exit_start_box(line, motors, motorspeed=65, confirm_ms=120, timeout_ms=6000)
+    ok = exit_start_box(line, motors, motorspeed=35, confirm_ms=120, timeout_ms=6000)
     if not ok:
         _stop_motors(motors)
         return False
