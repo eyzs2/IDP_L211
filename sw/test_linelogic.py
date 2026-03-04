@@ -36,10 +36,10 @@ def lineLogicTest():
 
     start_time = ticks_ms()
     now = ticks_ms()
-    motors[LEFT].Forward(side=LEFT, speed=70)
-    motors[RIGHT].Forward(side=RIGHT, speed=70)
+    motors[LEFT].Forward(side=LEFT, speed=80)
+    motors[RIGHT].Forward(side=RIGHT, speed=80)
 
-    while now - start_time < 5000:
+    while now - start_time < 10000:
         now = ticks_ms()
         print(line.leftOn.value(), line.rightOn.value())
         line.lineFollow(motors, loop=1)
