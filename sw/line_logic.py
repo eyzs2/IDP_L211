@@ -28,7 +28,7 @@ class LineSensor:
 
         # once loop done, self.loopCompletion = True
         # Decided by if all racks are checked
-        print("starting line follow")
+        print("Starting line follow")
 
         lineSense = self.lineSense
         turnDetection = self.turnLogic()
@@ -45,36 +45,23 @@ class LineSensor:
             sleep(0.5)
             if turnDetection == T or turnDetection == loop:
                 # execute turn based on predetermined outcome (loop)
-                print("turning ", loop)
+                print("turning ", "type: ", loop)
                 motors[loop].Reverse(side=loop, speed=50)
                 motors[(loop+1)%2].Forward(side=(loop+1)%2, speed=50)
                 while not (self.turnSense[loop].value() and lineSense[LEFT].value() and lineSense[RIGHT].value()): 
                     # i.e. wait until turn sensor back ON, both line sensors back on line
                     # do testing to determine reverse/forward values to complete turn and fulfil sensor criteria
-                    sleep(0.01)
-                    print("still turning")
+                    sleep(0.01)            
                     continue
-            # redundant code below
-            # elif turnDetection == loop:
-            #     # pivot about centre, inner turn wheel reverse, outer turn forward
-            #     motors[turnDetection].Reverse(side=turnDetection, speed=60)
-            #     motors[(turnDetection+1)%2].Forward(side=(turnDetection+1)%2, speed=60)
-                # while self.turnSense[turnDetection].value():
-                #     continue
-                # while not (self.turnSense[turnDetection].value() and lineSense[LEFT].value() and lineSense[RIGHT].value()): 
-                #     #i.e. wait until turn sensor back ON, both line sensors back on line
-                #     #TEST do testing to determine reverse/forward values to complete turn and fulfil sensor criteria
-                #     sleep(0.01)
-                #     continue
-            # stop after turn completion
-
+                print("turn complete")
+         
             motors[LEFT].off()
             motors[RIGHT].off()
             sleep(1.0)
 
             while self.turnSense[LEFT].value() or self.turnSense[RIGHT].value(): #keep moving forward until straight line sense is restored ie no turn detected
-                motors[LEFT].Forward(speed=60)
-                motors[RIGHT].Forward(speed=60)
+                motors[LEFT].Forward(LEFT, speed=60)
+                motors[RIGHT].Forward(RIGHT, speed=60)
             
             motors[LEFT].off()
             motors[RIGHT].off()
@@ -91,7 +78,6 @@ class LineSensor:
                         # Turn down opposite side speed only until BOTH sensors back on
                         opposite = (i+1) % 2
                         while not (lineSense[LEFT].value() and lineSense[RIGHT].value()):
-                            motors[i].Forward(side=i, speed=75)
                             motors[opposite].Forward(side=opposite, speed=40)  # Reduced speed on opposite
                             sleep(0.01)
                         break
@@ -99,7 +85,6 @@ class LineSensor:
         motors[LEFT].Forward(side=LEFT, speed=75)
         motors[RIGHT].Forward(side=RIGHT, speed=75)
         sleep(0.1)
-        print("line following code loop complete")           
 
     def turnLogic(self):
 
