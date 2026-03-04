@@ -46,8 +46,25 @@ RIGHT_MOTOR_PWM = 6
 # RIGHT_REEL_SENSOR = 0
 
 
+# memory variables to store state about the mission:
+
+racks_visited = []
+current_rack = None
+
+# Flag to signal immediate stop during line follow
+STOP_REQUESTED = False
+
+def on_button_press(pin):
+    """Interrupt handler: sets stop flag when button is pressed."""
+    global STOP_REQUESTED
+    STOP_REQUESTED = True
+
+
 # Push button (active HIGH with PULL_DOWN)
-button = ButtonEdge(Pin(BUTTON_PIN, Pin.IN, Pin.PULL_DOWN), debounce_ms=150)
+button_pin = Pin(BUTTON_PIN, Pin.IN, Pin.PULL_DOWN)
+button = ButtonEdge(button_pin, debounce_ms=150)
+# Set up interrupt on button pin for immediate stop during run
+button_pin.irq(handler=on_button_press, trigger=Pin.IRQ_RISING)
 
 
 # Line sensor object (from line_logic.py)
@@ -58,19 +75,11 @@ line = LineSensor(
     rightTurnPin=RIGHT_TURN_PIN
 )
 
-# reelsense = ReelSensor(leftReelSensorPin=LEFT_REEL_SENSOR, rightReelSensorPin=RIGHT_REEL_SENSOR)
-
 # Motor objects
 motors = [
     Motor(dirPin=LEFT_MOTOR_DIR, PWMPin=LEFT_MOTOR_PWM),
     Motor(dirPin=RIGHT_MOTOR_DIR, PWMPin=RIGHT_MOTOR_PWM),
 ]
-
-
-# memory variables to store state about the mission:
-
-racks_visited = []
-current_rack = None
 
 
 # helper functions
@@ -103,6 +112,9 @@ while True:
 
     # 1) WAIT FOR BUTTON PRESS TO START / RESTART
     wait_for_button_press()
+    
+    # Reset stop flag at start of each run
+    STOP_REQUESTED = False
 
     # 2) RESET MEMORY AND STOP MOTORS
     reset_memory()
@@ -131,19 +143,16 @@ while True:
     # This continues until the button is pressed again.
 
     while True:
+        # Check if stop was requested via button interrupt
+        if STOP_REQUESTED:
+            print("Restart requested.")
+            stop_motors()
+            break  # exit inner loop and restart from top
 
-        # calling line-follow logic
-        line.lineFollow(motors, loop=loop_mode)
+        # calling line-follow logic, pass callback to allow immediate stop
+        line.lineFollow(motors, loop=loop_mode, stop_check=lambda: STOP_REQUESTED)
 
         # flash LED to indicate robot is active
         led.toggle()
-
-        # Allow button press during run to restart system
-
-        # In the main loop, replace the inline button check:
-        if button.pressed():  # instead of: if button.value() == 1:
-            print("Restart requested.")
-            stop_motors()
-            break # exit inner loop and restart from top
 
         sleep(0.01)

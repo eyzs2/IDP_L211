@@ -23,8 +23,9 @@ class LineSensor:
         # self.rightOn.irq(handler=offLine, trigger=Pin.IRQ_FALLING)
         
 
-    def lineFollow(self, motors, loop): # define 0 left, 1 right
+    def lineFollow(self, motors, loop, stop_check=None): # define 0 left, 1 right
         # Takes in Motor list argument for correction
+        # stop_check: optional callable that returns True if should stop immediately
 
         # once loop done, self.loopCompletion = True
         # Decided by if all racks are checked
@@ -46,11 +47,19 @@ class LineSensor:
             if turnDetection == T or turnDetection == loop:
                 # execute turn based on predetermined outcome (loop)
                 print("turning ", "type: ", loop)
+                # Stop motors briefly before pivoting
+                motors[LEFT].off()
+                motors[RIGHT].off()
+                sleep(0.1)  # brief pause to let robot stop before turning
                 motors[loop].Reverse(side=loop, speed=50)
                 motors[(loop+1)%2].Forward(side=(loop+1)%2, speed=50)
                 while not (self.turnSense[loop].value() and lineSense[LEFT].value() and lineSense[RIGHT].value()): 
                     # i.e. wait until turn sensor back ON, both line sensors back on line
                     # do testing to determine reverse/forward values to complete turn and fulfil sensor criteria
+                    if stop_check and stop_check():
+                        motors[LEFT].off()
+                        motors[RIGHT].off()
+                        return
                     sleep(0.01)            
                     continue
                 print("turn complete")
@@ -60,6 +69,10 @@ class LineSensor:
             sleep(1.0)
 
             while self.turnSense[LEFT].value() or self.turnSense[RIGHT].value(): #keep moving forward until straight line sense is restored ie no turn detected
+                if stop_check and stop_check():
+                    motors[LEFT].off()
+                    motors[RIGHT].off()
+                    return
                 motors[LEFT].Forward(LEFT, speed=60)
                 motors[RIGHT].Forward(RIGHT, speed=60)
             
@@ -78,6 +91,10 @@ class LineSensor:
                         # Turn down opposite side speed only until BOTH sensors back on
                         opposite = (i+1) % 2
                         while not (lineSense[LEFT].value() and lineSense[RIGHT].value()):
+                            if stop_check and stop_check():
+                                motors[LEFT].off()
+                                motors[RIGHT].off()
+                                return
                             motors[opposite].Forward(side=opposite, speed=40)  # Reduced speed on opposite
                             sleep(0.01)
                         break
