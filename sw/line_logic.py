@@ -95,6 +95,7 @@ class LineSensor:
                                 motors[LEFT].off()
                                 motors[RIGHT].off()
                                 return
+                            motors[i].Forward(side=i, speed=60)  # retain other side speed
                             motors[opposite].Forward(side=opposite, speed=40)  # Reduced speed on opposite
                             sleep(0.01)
                         break
