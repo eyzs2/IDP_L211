@@ -83,12 +83,12 @@ class LineSensor:
                 if not lineSense[i].value() and turnDetection == NO_TURN:
                     print("correcting")
                     motors[i].off() # turn off opposite side motor to correct
-                    sleep(0.1) #TEST adjust based on tests
-                    motors[i].Forward(side=i,speed=50)
+                    sleep(0.5) #TEST adjust based on tests
+                    motors[i].Forward(side=i,speed=70)
                     
 
-        motors[LEFT].Forward(side=LEFT, speed=50)
-        motors[RIGHT].Forward(side=RIGHT, speed=50)
+        motors[LEFT].Forward(side=LEFT, speed=70)
+        motors[RIGHT].Forward(side=RIGHT, speed=70)
         sleep(0.5)
         print("line following code loop complete")           
 
@@ -112,10 +112,6 @@ class LineSensor:
         return NO_TURN
 
 
-        # TODO
-        # if either turn sensor is off , sleep 0.2s, test again
-        # if one still off, execute turn logic based on sensor
-        # if both off, execute hardcoded t-junction logic
 
 
 
