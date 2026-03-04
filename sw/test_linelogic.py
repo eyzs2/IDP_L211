@@ -1,5 +1,5 @@
 from line_logic import LineSensor
-from test_motor import Motor
+from motor import Motor
 from utime import ticks_ms, sleep
 
 # Front line sensors
@@ -7,8 +7,8 @@ LEFT_ON_PIN = 13
 RIGHT_ON_PIN = 12
 
 # Rear line sensors
-LEFT_TURN_PIN = 28
-RIGHT_TURN_PIN = 27
+LEFT_TURN_PIN = 27
+RIGHT_TURN_PIN = 28
 
 # Motor pins
 LEFT_MOTOR_DIR = 4
@@ -39,10 +39,11 @@ def lineLogicTest():
     motors[LEFT].Forward(side=LEFT, speed=80)
     motors[RIGHT].Forward(side=RIGHT, speed=80)
 
-    while now - start_time < 10000:
+    while now - start_time < 15000:
         now = ticks_ms()
-        print(line.leftOn.value(), line.rightOn.value())
-        line.lineFollow(motors, loop=1)
+        turnStatus = line.turnLogic(turnDirection=RIGHT, motors=motors)
+        line.lineFollow(motors)
+        print(line.turnSense[0].value(), line.turnSense[1].value())
 
     motors[LEFT].off()
     motors[RIGHT].off()

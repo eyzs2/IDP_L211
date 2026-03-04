@@ -39,60 +39,60 @@ class TurnScheduler:
     def _is_left_corner(self, detection) -> bool:
         return (detection == LEFT) and self._rear_left_white()
 
-    def attach(self):
-        self._original_turnLogic = self.line.turnLogic
-        self.line.turnLogic = self.filtered_turnLogic
+    # def attach(self):
+    #     self._original_turnLogic = self.line.turnLogic
+    #     self.line.turnLogic = self.filtered_turnLogic
 
-    def filtered_turnLogic(self):
-        detection = self._original_turnLogic()
+    # def filtered_turnLogic(self):
+    #     detection = self._original_turnLogic()
 
-        # clear lockout once no turn is detected anymore
-        if detection == NO_TURN:
-            self.lockout = False
-            return NO_TURN
+    #     # clear lockout once no turn is detected anymore
+    #     if detection == NO_TURN:
+    #         self.lockout = False
+    #         return NO_TURN
 
-        # prevent double counting at the same physical junction
-        if self.lockout:
-            return NO_TURN
+    #     # prevent double counting at the same physical junction
+    #     if self.lockout:
+    #         return NO_TURN
 
-        # Stage 0: first T junction -> allow T (direction determined by loop=RIGHT)
-        if self.stage == 0:
-            if detection == T:
-                self.lockout = True
-                self.stage = 1
-                return LEFT
-            return NO_TURN
+    #     # Stage 0: first T junction -> allow T (direction determined by loop=RIGHT)
+    #     if self.stage == 0:
+    #         if detection == T:
+    #             self.lockout = True
+    #             self.stage = 1
+    #             return LEFT
+    #         return NO_TURN
 
-        if self.stage == 1:
-            if detection == T:
-                self.lockout = True
-                self.stage = 2
-                return RIGHT
-            return NO_TURN
+    #     if self.stage == 1:
+    #         if detection == T:
+    #             self.lockout = True
+    #             self.stage = 2
+    #             return RIGHT
+    #         return NO_TURN
 
-        if self.stage == 2:
-            if self._is_right_corner(detection):
-                self.lockout = True
-                self.right_corners_taken += 1
-                if self.right_corners_taken >= 2:
-                    self.final_drive_pending = True
-                    self.stage = 3
-                return RIGHT
-            return NO_TURN
+    #     if self.stage == 2:
+    #         if self._is_right_corner(detection):
+    #             self.lockout = True
+    #             self.right_corners_taken += 1
+    #             if self.right_corners_taken >= 2:
+    #                 self.final_drive_pending = True
+    #                 self.stage = 3
+    #             return RIGHT
+    #         return NO_TURN
 
-        # Stage 3: take LEFT on the 2nd left-corner after the 8th right
-        if self.stage == 3:
-            if self._is_left_corner(detection):
-                self.left_corner_count_after_8 += 1
-                if self.left_corner_count_after_8 == 2:
-                    self.lockout = True
-                    self.stage = 4
-                    self.final_drive_pending = True
-                    return LEFT
-            return NO_TURN
+    #     # Stage 3: take LEFT on the 2nd left-corner after the 8th right
+    #     if self.stage == 3:
+    #         if self._is_left_corner(detection):
+    #             self.left_corner_count_after_8 += 1
+    #             if self.left_corner_count_after_8 == 2:
+    #                 self.lockout = True
+    #                 self.stage = 4
+    #                 self.final_drive_pending = True
+    #                 return LEFT
+    #         return NO_TURN
 
-        # Stage 4: finished, suppress all turns
-        return NO_TURN
+    #     # Stage 4: finished, suppress all turns
+    #     return NO_TURN
 
 
 def _stop_motors(motors):
@@ -109,23 +109,27 @@ def run_line_following_test(motors, line: LineSensor):
         return False
 
     # 2) Install filtered turning schedule
-    scheduler = TurnScheduler(line)
-    scheduler.attach()
+    # scheduler = TurnScheduler(line)
+    # scheduler.attach()
 
-    # 3) Follow the line; first T must be RIGHT so loop=RIGHT
-    loop_mode = LEFT
+    loop_mode = RIGHT # RIGHT for loop A
+
+    line.turnLogic(turnDirection = LEFT, motors=motors)
+
+    rightCounter = 0
+    leftCounter = 0
+
+    rightTurns = {}
 
     while True:
-        line.lineFollow(motors, loop=loop_mode)
+        line.lineFollow(motors)
+        turnStatus = line.turnLogic(turnDirection = loop_mode, motors=motors)
 
         # After final left completes, lineFollow returns and we do the final drive
-        if scheduler.final_drive_pending:
-            scheduler.final_drive_pending = False
-
-            motors[LEFT].Forward(LEFT, speed=60)
-            motors[RIGHT].Forward(RIGHT, speed=60)
-            sleep(0.2)  # ignore all sensors
-            _stop_motors(motors)
-            return True
+        # if scheduler.final_drive_pending:
+        #     scheduler.final_drive_pending = False
+        sleep(0.2)  # ignore all sensors
+        _stop_motors(motors)
+        return True
 
         sleep(0.01)

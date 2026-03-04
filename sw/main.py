@@ -8,7 +8,7 @@
 
 from machine import Pin
 from utime import sleep
-from test_motor import Motor
+from motor import Motor
 from line_logic import LineSensor, LEFT, RIGHT, T, NO_TURN
 from start_box import exit_start_box
 from pushbutton_logic import ButtonEdge
@@ -143,7 +143,8 @@ while True:
             break  # exit inner loop and restart from top
 
         # calling line-follow logic
-        line.lineFollow(motors, loop=loop_mode)
+        turnStatus = line.turnLogic(turnDirection=loop_mode, motors=motors)
+        line.lineFollow(motors)
 
         # flash LED to indicate robot is active
         led.toggle()

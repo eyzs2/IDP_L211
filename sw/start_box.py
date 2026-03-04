@@ -19,9 +19,18 @@ def exit_start_box(line, motors, motorspeed=25, confirm_ms=120, timeout_ms=2000)
         right_front_on_line = line.rightOn.value()
 
          # both must be true (white)
-        if left_front_on_line == 1 and right_front_on_line == 1:
+        if left_front_on_line and right_front_on_line:
             print("Both sensors on line.")
             print("speed: ", motorspeed)
+            while not (line.leftTurn and line.rightTurn):
+                sleep(0.1)
+            
+            print("Start box perimeter detected, continuing to first T-junction")
+
+            while (line.leftTurn or line.rightTurn):
+                sleep(0.1)
+
+            
             if confirm_start is None:
                 print("Line detected, confirming...")
                 confirm_start = ticks_ms()

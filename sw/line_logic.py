@@ -23,7 +23,7 @@ class LineSensor:
         # self.rightOn.irq(handler=offLine, trigger=Pin.IRQ_FALLING)
         
 
-    def lineFollow(self, motors, loop, stop_check=None): # define 0 left, 1 right
+    def lineFollow(self, motors): # define 0 left, 1 right
         # Takes in Motor list argument for correction
         # stop_check: optional callable that returns True if should stop immediately
 
@@ -32,7 +32,83 @@ class LineSensor:
         print("Starting line follow")
 
         lineSense = self.lineSense
-        turnDetection = self.turnLogic()
+        
+            # Check if either sensor is off the line
+        if not lineSense[LEFT].value() or not lineSense[RIGHT].value():
+            print("correcting")
+            # Find which sensor is off
+            for i in range(len(lineSense)):
+                if not lineSense[i].value():
+                    # Turn down opposite side speed only until BOTH sensors back on
+                    opposite = (i+1) % 2
+                    while not (lineSense[LEFT].value() and lineSense[RIGHT].value()):
+                        # if stop_check and stop_check():
+                        #     motors[LEFT].off()
+                        #     motors[RIGHT].off()
+                        #     return
+                        motors[i].Forward(side=i, speed=60)  # retain other side speed
+                        motors[opposite].Forward(side=opposite, speed=40)  # Reduced speed on opposite
+                        sleep(0.01)
+                    break
+
+        motors[LEFT].Forward(side=LEFT, speed=60)
+        motors[RIGHT].Forward(side=RIGHT, speed=60)
+        sleep(0.01)
+
+    def turnLogic(self, turnDirection, motors):
+
+        turnSense = self.turnSense
+
+        turnDetection = NO_TURN
+
+        if turnSense[LEFT].value() and turnSense[RIGHT].value():
+            sleep(0.1)
+            if turnSense[LEFT].value() and turnSense[RIGHT].value(): #verification
+                turnDetection = T
+
+        for i in range(len(turnSense)):
+            if turnSense[i].value() and not turnSense[(i+1)%2].value(): # If one side turn is detected, verify after T
+                sleep(0.1)
+                if turnSense[i].value():
+                    turnDetection = i # else treat as corner
+            
+        if turnDetection != NO_TURN:
+            # if override != None: # if override present, turn direction set as override
+            #     turnDirection = override
+            
+            print("turn detected", "turn type: ", turnDetection)
+            if turnDetection == T or turnDetection == turnDirection:
+                motors[LEFT].off()
+                motors[RIGHT].off()
+                sleep(2)  # brief pause to let robot stop before turning
+                # execute turn based on predetermined outcome (loop)
+                print("turning ", "type: ", turnDirection)
+                motors[turnDirection].Forward(side=turnDirection, speed=5)  # change turn speed here as needed
+                motors[(turnDirection+1) % 2].Forward(side=(turnDirection+1) % 2, speed=80)
+
+                # settle time: don't check sensors yet
+                while (self.lineSense[LEFT].value() or self.lineSense[RIGHT].value()):
+                    sleep(0.1) 
+                # wait until BOTH front sensors are back on the line
+                while not (self.lineSense[LEFT].value() and self.lineSense[RIGHT].value()):
+                    # if stop_check and stop_check():
+                    #     motors[LEFT].off()
+                    #     motors[RIGHT].off()
+                    #     return
+                    sleep(0.01)
+
+                motors[LEFT].off()
+                motors[RIGHT].off()
+                sleep(1.0)
+
+                print("turn complete")
+            else:
+                print("non-loop turn detected!!")
+
+        return turnDetection
+
+
+
 
         # lineSense is a list with left and right front sensors; lineSense[n].value() gives value of corresponding sensor
         # if not lineSense[LEFT].value() and not lineSense[RIGHT].value(): # End of junction/completely off line
@@ -40,90 +116,5 @@ class LineSensor:
         #         motors[LEFT].Reverse(side=LEFT,speed=10)
         #         motors[RIGHT].Reverse(side=RIGHT,speed=10)
         #         sleep(0.5)
-            
-        if turnDetection != NO_TURN:
-            print("turn detected", "turn type: ", turnDetection)
-            motors[LEFT].off()
-            motors[RIGHT].off()
-            sleep(0.1)  # brief pause to let robot stop before turning
-            if turnDetection == T or turnDetection == loop:
-                # execute turn based on predetermined outcome (loop)
-                print("turning ", "type: ", loop)
-                # Stop motors briefly before pivoting
-                motors[loop].Reverse(side=loop, speed=40)  # change turn speed here as needed
-                motors[(loop+1) % 2].Forward(side=(loop+1) % 2, speed=25)
-
-                # settle time: don't check sensors yet 
-                sleep(0.5)
-
-                # wait until BOTH front sensors are back on the line
-                while not (lineSense[LEFT].value() == 1 and lineSense[RIGHT].value() == 1):
-                    if stop_check and stop_check():
-                        motors[LEFT].off()
-                        motors[RIGHT].off()
-                        return
-                    sleep(0.01)
-
-            print("turn complete")
-         
-            motors[LEFT].off()
-            motors[RIGHT].off()
-            sleep(1.0)
-
-            while self.turnSense[LEFT].value() or self.turnSense[RIGHT].value(): #keep moving forward until straight line sense is restored ie no turn detected
-                if stop_check and stop_check():
-                    motors[LEFT].off()
-                    motors[RIGHT].off()
-                    return
-                motors[LEFT].Forward(LEFT, speed=60)
-                motors[RIGHT].Forward(RIGHT, speed=60)
-            
-            motors[LEFT].off()
-            motors[RIGHT].off()
-            sleep(1.0)
-
-
-        else: 
-            # Check if either sensor is off the line
-            if not lineSense[LEFT].value() or not lineSense[RIGHT].value():
-                print("correcting")
-                # Find which sensor is off
-                for i in range(len(lineSense)):
-                    if not lineSense[i].value():
-                        # Turn down opposite side speed only until BOTH sensors back on
-                        opposite = (i+1) % 2
-                        while not (lineSense[LEFT].value() and lineSense[RIGHT].value()):
-                            if stop_check and stop_check():
-                                motors[LEFT].off()
-                                motors[RIGHT].off()
-                                return
-                            motors[i].Forward(side=i, speed=60)  # retain other side speed
-                            motors[opposite].Forward(side=opposite, speed=30)  # Reduced speed on opposite
-                            sleep(0.01)
-                        break
-
-        motors[LEFT].Forward(side=LEFT, speed=60)
-        motors[RIGHT].Forward(side=RIGHT, speed=60)
-        sleep(0.01)
-
-    def turnLogic(self):
-
-        turnSense = self.turnSense
-
-        if turnSense[LEFT].value() and turnSense[RIGHT].value():
-            return T
-
-        for i in range(len(turnSense)):
-            if turnSense[i].value() and not turnSense[(i+1)%2].value(): # If one side turn is detected, check again for T
-                sleep(0.2)
-                if turnSense[LEFT].value() and turnSense[RIGHT].value(): # Check for T
-                    return T
-                if turnSense[i].value():
-                    return i # else treat as corner
-            
-        return NO_TURN
-
-
-
 
 
