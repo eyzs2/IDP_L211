@@ -43,7 +43,7 @@ class LineSensor:
             
         if turnDetection != NO_TURN:
             print("turn detected")
-            sleep(0.5)
+            sleep(0.02)
             if turnDetection == T or turnDetection == loop:
                 # execute turn based on predetermined outcome (loop)
                 print("turning ", "type: ", loop)
@@ -51,18 +51,22 @@ class LineSensor:
                 motors[LEFT].off()
                 motors[RIGHT].off()
                 sleep(0.1)  # brief pause to let robot stop before turning
-                motors[loop].Reverse(side=loop, speed=35)
-                motors[(loop+1)%2].Forward(side=(loop+1)%2, speed=35)
-                while not (self.turnSense[loop].value() and lineSense[LEFT].value() and lineSense[RIGHT].value()): 
-                    # i.e. wait until turn sensor back ON, both line sensors back on line
-                    # do testing to determine reverse/forward values to complete turn and fulfil sensor criteria
+
+                motors[loop].Reverse(side=loop, speed=35)  # change turn speed here as needed
+                motors[(loop+1) % 2].Forward(side=(loop+1) % 2, speed=35)
+
+                # settle time: don't check sensors yet 
+                sleep(0.5)
+
+                # wait until BOTH front sensors are back on the line
+                while not (lineSense[LEFT].value() == 1 and lineSense[RIGHT].value() == 1):
                     if stop_check and stop_check():
                         motors[LEFT].off()
                         motors[RIGHT].off()
                         return
-                    sleep(0.01)            
-                    continue
-                print("turn complete")
+                    sleep(0.01)
+
+            print("turn complete")
          
             motors[LEFT].off()
             motors[RIGHT].off()
@@ -96,8 +100,8 @@ class LineSensor:
                                 motors[RIGHT].off()
                                 return
                             motors[i].Forward(side=i, speed=60)  # retain other side speed
-                            motors[opposite].Forward(side=opposite, speed=40)  # Reduced speed on opposite
-                            sleep(0.01)
+                            motors[opposite].Forward(side=opposite, speed=30)  # Reduced speed on opposite
+                            sleep(0.03)
                         break
 
         motors[LEFT].Forward(side=LEFT, speed=60)
