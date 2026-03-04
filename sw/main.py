@@ -149,8 +149,8 @@ while True:
             stop_motors()
             break  # exit inner loop and restart from top
 
-        # calling line-follow logic, pass callback to allow immediate stop
-        line.lineFollow(motors, loop=loop_mode, stop_check=lambda: STOP_REQUESTED)
+        # calling line-follow logic
+        line.lineFollow(motors, loop=loop_mode)
 
         # flash LED to indicate robot is active
         led.toggle()
