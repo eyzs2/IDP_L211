@@ -3,7 +3,7 @@ from utime import sleep, ticks_ms, ticks_diff
 LEFT = 0
 RIGHT = 1
 
-def exit_start_box(line, motors, motorspeed=30, confirm_ms=120, timeout_ms=2000):
+def exit_start_box(line, motors, motorspeed=25, confirm_ms=120, timeout_ms=2000):
 
     start_time = ticks_ms()
     confirm_start = None

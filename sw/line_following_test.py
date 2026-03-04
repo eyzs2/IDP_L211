@@ -122,9 +122,9 @@ def run_line_following_test(motors, line: LineSensor):
         if scheduler.final_drive_pending:
             scheduler.final_drive_pending = False
 
-            motors[LEFT].Forward(LEFT, speed=75)
-            motors[RIGHT].Forward(RIGHT, speed=75)
-            sleep(0.5)  # ignore all sensors
+            motors[LEFT].Forward(LEFT, speed=60)
+            motors[RIGHT].Forward(RIGHT, speed=60)
+            sleep(0.2)  # ignore all sensors
             _stop_motors(motors)
             return True
 
