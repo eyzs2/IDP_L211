@@ -28,7 +28,7 @@ class LineSensor:
 
         # once loop done, self.loopCompletion = True
         # Decided by if all racks are checked
-        print("starting lien follow")
+        print("starting line follow")
 
         lineSense = self.lineSense
         turnDetection = self.turnLogic()
@@ -81,18 +81,23 @@ class LineSensor:
             sleep(1.0)
 
 
-
-           
         else: 
-            for i in range(len(lineSense)): # If one sensor is off
-                if not lineSense[i].value() and turnDetection == NO_TURN:
-                    print("correcting")
-                    while not lineSense[i].value():
-                        motors[(i+1)%2].Forward(side=((i+1)%2),speed=40) # turn off opposite side motor to correct
-                    sleep(0.05) #TEST adjust based on test
+            # Check if either sensor is off the line
+            if not lineSense[LEFT].value() or not lineSense[RIGHT].value():
+                print("correcting")
+                # Find which sensor is off
+                for i in range(len(lineSense)):
+                    if not lineSense[i].value():
+                        # Turn down opposite side speed only until BOTH sensors back on
+                        opposite = (i+1) % 2
+                        while not (lineSense[LEFT].value() and lineSense[RIGHT].value()):
+                            motors[i].Forward(side=i, speed=75)
+                            motors[opposite].Forward(side=opposite, speed=40)  # Reduced speed on opposite
+                            sleep(0.01)
+                        break
 
-        motors[LEFT].Forward(side=LEFT, speed=80)
-        motors[RIGHT].Forward(side=RIGHT, speed=80)
+        motors[LEFT].Forward(side=LEFT, speed=75)
+        motors[RIGHT].Forward(side=RIGHT, speed=75)
         sleep(0.1)
         print("line following code loop complete")           
 

@@ -23,6 +23,7 @@ def exit_start_box(line, motors, motorspeed=35, confirm_ms=120, timeout_ms=6000)
 
          # both must be true (white)
         if left_front_on_line == 1 and right_front_on_line == 1:
+            print("Both sensors on line.")
             if confirm_start is None:
                 print("Line detected, confirming...")
                 confirm_start = ticks_ms()
