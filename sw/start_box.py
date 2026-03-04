@@ -18,9 +18,6 @@ def exit_start_box(line, motors, motorspeed=35, confirm_ms=120, timeout_ms=6000)
         left_front_on_line = line.leftOn.value()
         right_front_on_line = line.rightOn.value()
 
-        print(f"LEFT={left_front_on_line} RIGHT={right_front_on_line}")
-
-
          # both must be true (white)
         if left_front_on_line == 1 and right_front_on_line == 1:
             print("Both sensors on line.")
@@ -28,9 +25,16 @@ def exit_start_box(line, motors, motorspeed=35, confirm_ms=120, timeout_ms=6000)
                 print("Line detected, confirming...")
                 confirm_start = ticks_ms()
             elif ticks_diff(ticks_ms(), confirm_start) > confirm_ms:
+                print("Line confirmed. Exiting start box...")
+                drive_start = ticks_ms()
+                while ticks_diff(ticks_ms(), drive_start) < 1000:
+                    motors[LEFT].Forward(LEFT, speed=motorspeed)
+                    motors[RIGHT].Forward(RIGHT, speed=motorspeed)
+                    sleep(0.01)
+
                 motors[LEFT].off()
                 motors[RIGHT].off()
-                print("Line detected, exiting start box...")
+                print("1 second of straight complete, start line follow logic...")
                 sleep(0.05)
                 return True
         else:
