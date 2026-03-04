@@ -117,7 +117,7 @@ while True:
     # True for successfully found the line
     # False for timeout / failure
 
-    success = exit_start_box(line, motors, speed=65)
+    success = exit_start_box(line, motors, motorspeed=65)
 
     if not success:
         print("Failed to detect line. Waiting for restart.")

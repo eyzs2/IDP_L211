@@ -113,8 +113,6 @@ class LineSensor:
             
         return NO_TURN
 
-        return NO_TURN
-
 
 
 
