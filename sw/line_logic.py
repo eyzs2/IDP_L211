@@ -51,8 +51,8 @@ class LineSensor:
                 motors[LEFT].off()
                 motors[RIGHT].off()
                 sleep(0.1)  # brief pause to let robot stop before turning
-                motors[loop].Reverse(side=loop, speed=45)
-                motors[(loop+1)%2].Forward(side=(loop+1)%2, speed=45)
+                motors[loop].Reverse(side=loop, speed=35)
+                motors[(loop+1)%2].Forward(side=(loop+1)%2, speed=35)
                 while not (self.turnSense[loop].value() and lineSense[LEFT].value() and lineSense[RIGHT].value()): 
                     # i.e. wait until turn sensor back ON, both line sensors back on line
                     # do testing to determine reverse/forward values to complete turn and fulfil sensor criteria
@@ -73,8 +73,8 @@ class LineSensor:
                     motors[LEFT].off()
                     motors[RIGHT].off()
                     return
-                motors[LEFT].Forward(LEFT, speed=45)
-                motors[RIGHT].Forward(RIGHT, speed=45)
+                motors[LEFT].Forward(LEFT, speed=60)
+                motors[RIGHT].Forward(RIGHT, speed=60)
             
             motors[LEFT].off()
             motors[RIGHT].off()
@@ -95,12 +95,12 @@ class LineSensor:
                                 motors[LEFT].off()
                                 motors[RIGHT].off()
                                 return
-                            motors[opposite].Forward(side=opposite, speed=35)  # Reduced speed on opposite
+                            motors[opposite].Forward(side=opposite, speed=40)  # Reduced speed on opposite
                             sleep(0.01)
                         break
 
-        motors[LEFT].Forward(side=LEFT, speed=45)
-        motors[RIGHT].Forward(side=RIGHT, speed=45)
+        motors[LEFT].Forward(side=LEFT, speed=60)
+        motors[RIGHT].Forward(side=RIGHT, speed=60)
         sleep(0.1)
 
     def turnLogic(self):
