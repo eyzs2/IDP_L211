@@ -11,8 +11,8 @@ def exit_start_box(line, motors, speed=35, confirm_ms=120, timeout_ms=6000):
     while ticks_diff(ticks_ms(), start_time) < timeout_ms:
 
         # drive straight forward 
-        motors[LEFT].Forward(LEFT, speed)
-        motors[RIGHT].Forward(RIGHT, speed)
+        motors[LEFT].Forward(LEFT, speed=speed)
+        motors[RIGHT].Forward(RIGHT, speed=speed)
 
         # read front sensors 
         left_front_on_line = line.leftOn.value()
