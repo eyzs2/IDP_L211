@@ -1,5 +1,4 @@
 from utime import sleep
-
 from line_logic import LineSensor, LEFT, RIGHT, NO_TURN, T
 from start_box import exit_start_box
 
@@ -8,7 +7,7 @@ class TurnScheduler:
     """ 
     rules for the LINE FOLLOWING TEST:
 
-    1) Turn RIGHT at the first T junction.
+    1) Turn LEFT at the first T junction.
     2) Turn RIGHT at the next 2 right corner junctions defined by:
          - both front sensors black
          - rear-right sensor white
@@ -48,7 +47,6 @@ class TurnScheduler:
         return (detection == RIGHT) and self._front_both_black() and self._rear_right_white()
 
     def _is_left_corner(self, detection) -> bool:
-        # If you later want extra conditions (e.g. rear-left white), add them here.
         return (detection == LEFT) and self._rear_left_white()
 
     def attach(self):
@@ -116,9 +114,6 @@ def _stop_motors(motors):
 
 
 def run_line_following_test(motors, line: LineSensor):
-    """
-    Call this from main.py to run the test.
-    """
 
     # 1) Exit start box
     ok = exit_start_box(line, motors, speed=35, confirm_ms=120, timeout_ms=6000)
@@ -131,7 +126,7 @@ def run_line_following_test(motors, line: LineSensor):
     scheduler.attach()
 
     # 3) Follow the line; first T must be RIGHT so loop=RIGHT
-    loop = RIGHT
+    loop = LEFT
 
     while True:
         line.lineFollow(motors, loop=loop)
