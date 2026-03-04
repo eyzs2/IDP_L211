@@ -92,9 +92,10 @@ def stop_motors():
 
 
 def wait_for_button_press():
+    print("Waiting for button press...")
     while not button.pressed():
         sleep(0.01)
-
+    print("Button pressed.")
 
 # main program loop
 
