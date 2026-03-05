@@ -28,7 +28,7 @@ class LineSensor:
 
         lineSense = self.lineSense
         
-            # Check if either sensor is off the line
+        # Check if either sensor is off the line
         if not lineSense[LEFT].value() or not lineSense[RIGHT].value():
             # Find which sensor is off
             for i in range(len(lineSense)):

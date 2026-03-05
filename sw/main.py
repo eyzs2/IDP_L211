@@ -43,8 +43,9 @@ LEFT_MOTOR_PWM = 5
 RIGHT_MOTOR_DIR = 7
 RIGHT_MOTOR_PWM = 6
 
-# LEFT_REEL_SENSOR = 0
-# RIGHT_REEL_SENSOR = 0
+# Reel sensor pins (analog inputs for distance sensors)
+LEFT_REEL_SENSOR_PIN = 0  # adjust based on electrical team's wiring
+RIGHT_REEL_SENSOR_PIN = 1  # adjust based on electrical team's wiring
 
 
 # memory variables to store state about the mission:
@@ -74,6 +75,12 @@ motors = [
     Motor(dirPin=LEFT_MOTOR_DIR, PWMPin=LEFT_MOTOR_PWM),
     Motor(dirPin=RIGHT_MOTOR_DIR, PWMPin=RIGHT_MOTOR_PWM),
 ]
+
+# Reel sensor object
+reel = ReelSensor(
+    leftReelSensorPin=LEFT_REEL_SENSOR_PIN,
+    rightReelSensorPin=RIGHT_REEL_SENSOR_PIN
+)
 
 
 # helper functions
@@ -135,7 +142,7 @@ while True:
     # 4) NORMAL LINE FOLLOW MODE
     # This continues until the button is pressed again.
 
-    win = run_line_following_test(motors, line)
+    win = run_line_following_test(motors, line, reel_sensor=reel)
         # Check if stop was requested via button interrupt
         # if STOP_REQUESTED:
         #     print("Restart requested.")
