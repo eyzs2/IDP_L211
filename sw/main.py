@@ -113,7 +113,6 @@ while True:
     # 2) RESET MEMORY AND STOP MOTORS
     reset_memory()
     stop_motors()
-    led.value(0)
 
     print("Starting robot from black box...")
 
