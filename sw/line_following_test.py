@@ -103,10 +103,10 @@ def _stop_motors(motors):
 def run_line_following_test(motors, line: LineSensor):
 
     # 1) Exit start box
-    ok = exit_start_box(line, motors, motorspeed=35, confirm_ms=120, timeout_ms=6000)
-    if not ok:
-        _stop_motors(motors)
-        return False
+    # ok = exit_start_box(line, motors, motorspeed=35, confirm_ms=120, timeout_ms=6000)
+    # if not ok:
+    #     _stop_motors(motors)
+    #     return False
 
     # 2) Install filtered turning schedule
     # scheduler = TurnScheduler(line)
@@ -119,17 +119,39 @@ def run_line_following_test(motors, line: LineSensor):
     rightCounter = 0
     leftCounter = 0
 
-    rightTurns = {}
+    rightTurns = {1,8,10,17}
+    leftTurns = {2}
 
     while True:
         line.lineFollow(motors)
-        turnStatus = line.turnLogic(turnDirection = loop_mode, motors=motors)
+        if line.turnSense[RIGHT].value():
+            rightCounter += 1
+            if rightCounter in rightTurns:
+                line.turnLogic(turnDirection = RIGHT, motors=motors)
+            else:
+                while line.turnSense[RIGHT].value():
+                    sleep(0.1)
 
+        if rightCounter == max(rightTurns):
+            if line.turnSense[LEFT].value():
+                leftCounter += 1
+                if leftCounter in leftTurns:
+                    line.turnLogic(turnDirection = LEFT, motors=motors)
+                    break
+                else:
+                    while line.turnSense[LEFT].value():
+                        sleep(0.1)
+
+    while not (line.turnSense[LEFT].value() and line.turnSense[RIGHT].value):
+        line.lineFollow(motors)
+    _stop_motors(motors)
+
+    motors[LEFT].Forward(side=LEFT, speed = 60)
+    motors[RIGHT].Forward(side=RIGHT, speed = 60)
+        
         # After final left completes, lineFollow returns and we do the final drive
         # if scheduler.final_drive_pending:
         #     scheduler.final_drive_pending = False
-        sleep(0.2)  # ignore all sensors
-        _stop_motors(motors)
-        return True
-
-        sleep(0.01)
+    sleep(1)  # ignore all sensors
+    _stop_motors(motors)
+    return True

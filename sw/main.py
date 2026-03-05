@@ -12,6 +12,7 @@ from motor import Motor
 from line_logic import LineSensor, LEFT, RIGHT, T, NO_TURN
 from start_box import exit_start_box
 from pushbutton_logic import ButtonEdge
+from line_following_test import run_line_following_test
 
 
 # Mode A = Turn LEFT at first T junction
@@ -135,18 +136,18 @@ while True:
     # 4) NORMAL LINE FOLLOW MODE
     # This continues until the button is pressed again.
 
-    while True:
+    win = run_line_following_test(motors, line)
         # Check if stop was requested via button interrupt
-        if STOP_REQUESTED:
-            print("Restart requested.")
-            stop_motors()
-            break  # exit inner loop and restart from top
+        # if STOP_REQUESTED:
+        #     print("Restart requested.")
+        #     stop_motors()
+        #     break  # exit inner loop and restart from top
 
-        # calling line-follow logic
-        turnStatus = line.turnLogic(turnDirection=loop_mode, motors=motors)
-        line.lineFollow(motors)
+        # # calling line-follow logic
+        # line.turnLogic(turnDirection=loop_mode, motors=motors)
+        # line.lineFollow(motors)
 
-        # flash LED to indicate robot is active
-        led.toggle()
+        # # flash LED to indicate robot is active
+        # led.toggle()
 
-        sleep(0.01)
+        # sleep(0.01)
