@@ -29,13 +29,11 @@ class LineSensor:
 
         # once loop done, self.loopCompletion = True
         # Decided by if all racks are checked
-        print("Starting line follow")
 
         lineSense = self.lineSense
         
             # Check if either sensor is off the line
         if not lineSense[LEFT].value() or not lineSense[RIGHT].value():
-            print("correcting")
             # Find which sensor is off
             for i in range(len(lineSense)):
                 if not lineSense[i].value():

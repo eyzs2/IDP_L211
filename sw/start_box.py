@@ -1,9 +1,10 @@
 from utime import sleep, ticks_ms, ticks_diff
+from line_logic import LineSensor
 
 LEFT = 0
 RIGHT = 1
 
-def exit_start_box(line, motors, motorspeed=25, confirm_ms=120, timeout_ms=2000):
+def exit_start_box(line:LineSensor, motors, motorspeed=25, confirm_ms=120, timeout_ms=2000):
 
     start_time = ticks_ms()
     confirm_start = None
@@ -15,36 +16,30 @@ def exit_start_box(line, motors, motorspeed=25, confirm_ms=120, timeout_ms=2000)
         motors[RIGHT].Forward(RIGHT, speed=motorspeed)
 
         # read front sensors 
-        left_front_on_line = line.leftOn.value()
-        right_front_on_line = line.rightOn.value()
+        left_turn_on_line = line.leftTurn.value()
+        right_turn_on_line = line.rightTurn.value()
 
          # both must be true (white)
-        if left_front_on_line and right_front_on_line:
-            print("Both sensors on line.")
-            print("speed: ", motorspeed)
-            while not (line.leftTurn and line.rightTurn):
-                sleep(0.1)
-            
-            print("Start box perimeter detected, continuing to first T-junction")
+        if left_turn_on_line and right_turn_on_line:
 
-            while (line.leftTurn or line.rightTurn):
-                sleep(0.1)
 
             
             if confirm_start is None:
                 print("Line detected, confirming...")
                 confirm_start = ticks_ms()
+                motors[LEFT].off()
+                motors[RIGHT].off()
+
             elif ticks_diff(ticks_ms(), confirm_start) > confirm_ms:
                 print("Line confirmed. Exiting start box...")
-                drive_start = ticks_ms()
-                while ticks_diff(ticks_ms(), drive_start) < 800:
-                    motors[LEFT].Forward(LEFT, speed=motorspeed)
-                    motors[RIGHT].Forward(RIGHT, speed=motorspeed)
-                    sleep(0.01)
+                while (line.turnSense[LEFT].value() or line.turnSense[RIGHT].value()):
+                    line.lineFollow(motors)
+                while not (line.turnSense[LEFT].value() and line.turnSense[RIGHT].value()):
+                    line.lineFollow(motors)
 
                 motors[LEFT].off()
                 motors[RIGHT].off()
-                print("straight stint complete, start line follow logic...")
+                print("T reached, start line follow logic...")
                 return True
         else:
             confirm_start = None

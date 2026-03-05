@@ -34,8 +34,8 @@ LEFT_ON_PIN = 13
 RIGHT_ON_PIN = 12
 
 # Rear line sensors
-LEFT_TURN_PIN = 28
-RIGHT_TURN_PIN = 27
+LEFT_TURN_PIN = 27
+RIGHT_TURN_PIN = 28
 
 # Motor pins
 LEFT_MOTOR_DIR = 4
@@ -123,7 +123,7 @@ while True:
     # True for successfully found the line
     # False for timeout / failure
 
-    success = exit_start_box(line, motors, motorspeed=65)
+    success = exit_start_box(line, motors, motorspeed=35)
 
     if not success:
         print("Failed to detect line. Waiting for restart.")
