@@ -12,7 +12,7 @@ from motor import Motor
 from line_logic import LineSensor, LEFT, RIGHT, T, NO_TURN
 from start_box import exit_start_box
 from pushbutton_logic import ButtonEdge, request_stop_irq, StopRequested
-from line_following_test import run_line_following_test
+# from line_following_test import run_line_following_test
 from test_linelogic import lineLogicTest
 
 
