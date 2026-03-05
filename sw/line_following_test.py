@@ -115,32 +115,37 @@ def run_line_following_test(motors, line: LineSensor):
     loop_mode = RIGHT # RIGHT for loop A
 
     line.turnLogic(turnDirection = LEFT, motors=motors)
+    print("first left complee")
 
     rightCounter = 0
     leftCounter = 0
 
-    rightTurns = {1,8,10,17}
+    rightTurns = {1,9,11,19}
     leftTurns = {2}
 
     while True:
         line.lineFollow(motors)
         if line.turnSense[RIGHT].value():
-            rightCounter += 1
-            if rightCounter in rightTurns:
-                line.turnLogic(turnDirection = RIGHT, motors=motors)
-            else:
-                while line.turnSense[RIGHT].value():
-                    sleep(0.1)
+            sleep(0.15)
+            if line.turnSense[RIGHT].value():
+                print("turn ", RIGHT, " detected")
+                rightCounter += 1
+                print("turn number ", rightCounter)
+                if rightCounter in rightTurns:
+                    _stop_motors(motors)
+                    print("turning")
+                    line.turnLogic(turnDirection = RIGHT, motors=motors)
+                
 
         if rightCounter == max(rightTurns):
             if line.turnSense[LEFT].value():
-                leftCounter += 1
-                if leftCounter in leftTurns:
-                    line.turnLogic(turnDirection = LEFT, motors=motors)
-                    break
-                else:
-                    while line.turnSense[LEFT].value():
-                        sleep(0.1)
+                sleep(0.15)
+                if line.turnSense[LEFT].value():
+                    leftCounter += 1
+                    if leftCounter in leftTurns:
+                        _stop_motors(motors)
+                        line.turnLogic(turnDirection = LEFT, motors=motors)
+                        break
 
     while not (line.turnSense[LEFT].value() and line.turnSense[RIGHT].value):
         line.lineFollow(motors)
