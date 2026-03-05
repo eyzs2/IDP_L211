@@ -105,8 +105,6 @@ class LineSensor:
             else:
                 print("non-loop turn detected!!")
 
-        return turnDetection
-
 
 
 
