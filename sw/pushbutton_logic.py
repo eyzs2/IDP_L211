@@ -1,4 +1,5 @@
 from utime import ticks_ms, ticks_diff
+import micropython
 
 class ButtonEdge:
 
@@ -21,4 +22,15 @@ class ButtonEdge:
         self._last_state = state
         return fired
     
+class StopRequested(Exception):
+    """Raised via micropython.schedule from button IRQ to abort execution."""
+    pass
+
+def _sched_raise(_arg):
+    # runs in main context (scheduled), raising will unwind the running code
+    raise StopRequested()
+
+def request_stop_irq(pin=None):
+    # call from IRQ handler: schedule a raise in main context
+    micropython.schedule(_sched_raise, 0)
     

@@ -11,8 +11,9 @@ from utime import sleep
 from motor import Motor
 from line_logic import LineSensor, LEFT, RIGHT, T, NO_TURN
 from start_box import exit_start_box
-from pushbutton_logic import ButtonEdge
+from pushbutton_logic import ButtonEdge, request_stop_irq, StopRequested
 from line_following_test import run_line_following_test
+from test_linelogic import lineLogicTest
 
 
 # Mode A = Turn LEFT at first T junction
@@ -100,6 +101,10 @@ def wait_for_button_press():
         sleep(0.01)
     print("Button pressed.")
 
+# Set up interrupt on button pin for immediate stop during run
+button_pin.irq(trigger=Pin.IRQ_RISING, handler=request_stop_irq)
+
+
 # main program loop
 
 while True:
@@ -114,29 +119,41 @@ while True:
     reset_memory()
     stop_motors()
 
-    print("Starting robot from black box...")
-
-    # 3) EXIT BLACK START BOX
-    # drives straight forward until BOTH front sensors detect the line.
-    # exit_start_box() returns:
-    # True for successfully found the line
-    # False for timeout / failure
-
-    success = exit_start_box(line, motors, motorspeed=35)
-
-    if not success:
-        print("Failed to detect line. Waiting for restart.")
+    try:
+        lineLogicTest()
+    except StopRequested:
+        print("Stop requested — stopping motors and restarting.")
         stop_motors()
-        continue   # go back to waiting for button
+        # small delay to debounce / give scheduled exceptions time to clear
+        sleep(0.1)
+        continue
+    
 
 
-    print("Line detected. Beginning line-following mode.")
 
-    # 4) NORMAL LINE FOLLOW MODE
-    # This continues until the button is pressed again.
+    # print("Starting robot from black box...")
 
-    win = run_line_following_test(motors, line)
-        # Check if stop was requested via button interrupt
+    # # 3) EXIT BLACK START BOX
+    # # drives straight forward until BOTH front sensors detect the line.
+    # # exit_start_box() returns:
+    # # True for successfully found the line
+    # # False for timeout / failure
+
+    # success = exit_start_box(line, motors, motorspeed=35)
+
+    # if not success:
+    #     print("Failed to detect line. Waiting for restart.")
+    #     stop_motors()
+    #     continue   # go back to waiting for button
+
+
+    # print("Line detected. Beginning line-following mode.")
+
+    # # 4) NORMAL LINE FOLLOW MODE
+    # # This continues until the button is pressed again.
+
+    # win = run_line_following_test(motors, line)
+    #     # Check if stop was requested via button interrupt
         # if STOP_REQUESTED:
         #     print("Restart requested.")
         #     stop_motors()

@@ -43,7 +43,6 @@ def lineLogicTest():
         now = ticks_ms()
         line.turnLogic(turnDirection=RIGHT, motors=motors)
         line.lineFollow(motors)
-        print(line.turnSense[0].value(), line.turnSense[1].value())
 
     motors[LEFT].off()
     motors[RIGHT].off()

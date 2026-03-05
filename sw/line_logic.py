@@ -21,11 +21,7 @@ class LineSensor:
    
 
     def lineFollow(self, motors): # define 0 left, 1 right
-        # Takes in Motor list argument for correction
-
-        # Decided by if all racks are checked
-        print("Starting line follow")
-
+        
         lineSense = self.lineSense
         
             # Check if either sensor is off the line
@@ -35,14 +31,13 @@ class LineSensor:
                 if not lineSense[i].value():
                     # Turn down opposite side speed only until BOTH sensors back on
                     opposite = (i+1) % 2
-                    while not (lineSense[LEFT].value() and lineSense[RIGHT].value()):
-                        motors[i].Forward(side=i, speed=60)  # retain other side speed
-                        motors[opposite].Forward(side=opposite, speed=40)  # Reduced speed on opposite
-                        sleep(0.01)
-                    break
+                    motors[i].Forward(side=i, speed=60)  # retain other side speed
+                    motors[opposite].Forward(side=opposite, speed=35)  # Reduced speed on opposite
+                    sleep(0.01)
 
-        motors[LEFT].Forward(side=LEFT, speed=60)
-        motors[RIGHT].Forward(side=RIGHT, speed=60)
+        else:
+            motors[LEFT].Forward(side=LEFT, speed=60)
+            motors[RIGHT].Forward(side=RIGHT, speed=60)
         sleep(0.01)
 
     def turnLogic(self, turnDirection, motors):
@@ -52,13 +47,13 @@ class LineSensor:
         turnDetection = NO_TURN
 
         if turnSense[LEFT].value() and turnSense[RIGHT].value():
-            sleep(0.1)
+            sleep(0.05)
             if turnSense[LEFT].value() and turnSense[RIGHT].value(): #verification
                 turnDetection = T
 
         for i in range(len(turnSense)):
             if turnSense[i].value() and not turnSense[(i+1)%2].value(): # If one side turn is detected, verify after T
-                sleep(0.1)
+                sleep(0.05)
                 if turnSense[i].value():
                     turnDetection = i # else treat as corner
             
@@ -70,7 +65,7 @@ class LineSensor:
             if turnDetection == T or turnDetection == turnDirection:
                 motors[LEFT].off()
                 motors[RIGHT].off()
-                sleep(0.5)  # brief pause to let robot stop before turning
+                sleep(1)  # brief pause to let robot stop before turning
                 # execute turn based on predetermined outcome (loop)
                 print("turning ", "type: ", turnDirection)
                 motors[turnDirection].Forward(side=turnDirection, speed=5)  # change turn speed here as needed

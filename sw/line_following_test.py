@@ -44,7 +44,7 @@ def _stop_motors(motors):
     motors[RIGHT].off()
 
 
-def run_line_following_test(motors, line: LineSensor):
+def run_line_following_test(motors, line):
 
     loop_mode = RIGHT # RIGHT for loop A
 
