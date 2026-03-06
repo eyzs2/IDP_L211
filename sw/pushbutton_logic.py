@@ -22,15 +22,29 @@ class ButtonEdge:
         self._last_state = state
         return fired
     
-class StopRequested(Exception):
+class StopRequested(BaseException):
     """Raised via micropython.schedule from button IRQ to abort execution."""
     pass
 
-def _sched_raise(_arg):
-    # runs in main context (scheduled), raising will unwind the running code
-    raise StopRequested()
+# IRQ-safe: schedule a small setter in main context
+_STOP_REQUESTED = False
+
+def _sched_set_flag(_arg):
+    global _STOP_REQUESTED
+    _STOP_REQUESTED = True
 
 def request_stop_irq(pin=None):
     # call from IRQ handler: schedule a raise in main context
-    micropython.schedule(_sched_raise, 0)
+    micropython.schedule(_sched_set_flag, 0)
+
+def stop_requested() -> bool:
+    return _STOP_REQUESTED
+
+def clear_stop():
+    global _STOP_REQUESTED
+    _STOP_REQUESTED = False
+
+def stop_function():
+    if _STOP_REQUESTED:
+        raise StopRequested()
     
