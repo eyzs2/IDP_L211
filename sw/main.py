@@ -61,20 +61,21 @@ button_pin = Pin(BUTTON_PIN, Pin.IN, Pin.PULL_DOWN)
 button = ButtonEdge(button_pin, debounce_ms=150)
 # Set up interrupt on button pin for immediate stop during run
 
+# Motor objects
+motors = [
+    Motor(dirPin=LEFT_MOTOR_DIR, PWMPin=LEFT_MOTOR_PWM),
+    Motor(dirPin=RIGHT_MOTOR_DIR, PWMPin=RIGHT_MOTOR_PWM),
+]
 
 # Line sensor object (from line_logic.py)
 line = LineSensor(
     leftOnPin=LEFT_ON_PIN,
     rightOnPin=RIGHT_ON_PIN,
     leftTurnPin=LEFT_TURN_PIN,
-    rightTurnPin=RIGHT_TURN_PIN
+    rightTurnPin=RIGHT_TURN_PIN,
+    motors=motors
 )
 
-# Motor objects
-motors = [
-    Motor(dirPin=LEFT_MOTOR_DIR, PWMPin=LEFT_MOTOR_PWM),
-    Motor(dirPin=RIGHT_MOTOR_DIR, PWMPin=RIGHT_MOTOR_PWM),
-]
 
 # Reel sensor object
 reel = ReelSensor(

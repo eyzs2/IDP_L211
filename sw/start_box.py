@@ -33,9 +33,9 @@ def exit_start_box(line:LineSensor, motors, motorspeed=25, confirm_ms=120, timeo
             elif ticks_diff(ticks_ms(), confirm_start) > confirm_ms:
                 print("Line confirmed. Exiting start box...")
                 while (line.turnSense[LEFT].value() or line.turnSense[RIGHT].value()):
-                    line.lineFollow(motors, FORWARD)
+                    line.lineFollow(FORWARD)
                 while not (line.turnSense[LEFT].value() and line.turnSense[RIGHT].value()):
-                    line.lineFollow(motors, FORWARD)
+                    line.lineFollow(FORWARD)
 
                 motors[LEFT].off()
                 motors[RIGHT].off()

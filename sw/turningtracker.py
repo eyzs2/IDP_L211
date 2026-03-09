@@ -1,5 +1,6 @@
 from utime import sleep, ticks_diff, ticks_ms
-from line_logic import LineSensor, LEFT, RIGHT, NO_TURN, T
+from line_logic import LineSensor, LEFT, RIGHT, NO_TURN, T, FORWARD, REVERSE
+from motor import Motor
 from start_box import exit_start_box
 from reelsensor import ReelSensor
 
@@ -37,7 +38,7 @@ def run_turning_tracker(motors, line: LineSensor):
 
     # main loop
     while True:
-        line.lineFollow(DIRECTION)
+        line.lineFollow(FORWARD)
 
         L = rear_L()
         R = rear_R()
