@@ -21,18 +21,21 @@ RIGHT_REEL_SENSOR = 0
 
 LEFT = 0
 RIGHT = 1
+FORWARD = 0
+REVERSE = 1
 
 def lineLogicTest():
-    line = LineSensor(leftOnPin=LEFT_ON_PIN,
-        rightOnPin=RIGHT_ON_PIN,
-        leftTurnPin=LEFT_TURN_PIN,
-        rightTurnPin=RIGHT_TURN_PIN
-    )
-
-    motors = [
+    motor = [
         Motor(dirPin=LEFT_MOTOR_DIR, PWMPin=LEFT_MOTOR_PWM),
         Motor(dirPin=RIGHT_MOTOR_DIR, PWMPin=RIGHT_MOTOR_PWM),
     ]
+    
+    line = LineSensor(leftOnPin=LEFT_ON_PIN,
+        rightOnPin=RIGHT_ON_PIN,
+        leftTurnPin=LEFT_TURN_PIN,
+        rightTurnPin=RIGHT_TURN_PIN,
+        motors = motor
+    )
 
     start_time = ticks_ms()
     now = ticks_ms()
@@ -41,8 +44,8 @@ def lineLogicTest():
 
     while now - start_time < 15000:
         now = ticks_ms()
-        line.turnLogic(turnDirection=RIGHT, motors=motors)
-        line.lineFollow(motors)
+        line.turnLogic(turnDirection=RIGHT)
+        line.lineFollow(motors, FORWARD)
 
     motors[LEFT].off()
     motors[RIGHT].off()

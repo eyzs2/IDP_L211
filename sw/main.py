@@ -11,8 +11,8 @@ from utime import sleep
 from motor import Motor
 from line_logic import LineSensor, LEFT, RIGHT, T, NO_TURN
 from start_box import exit_start_box
-from pushbutton_logic import ButtonEdge, request_stop_irq, StopRequested
-from line_following_test import run_line_following_test
+from pushbutton_logic import ButtonEdge, request_stop_irq, StopRequested, clear_stop
+# from line_following_test import run_line_following_test
 from test_linelogic import lineLogicTest
 
 
@@ -107,11 +107,14 @@ def wait_for_button_press():
     while not button.pressed():
         sleep(0.01)
     print("Button pressed.")
+    clear_stop()
+    sleep(0.5)
 
 # Set up interrupt on button pin for immediate stop during run
+# button_pin.irq(trigger=Pin.IRQ_RISING, handler=request_stop_irq)
+
+
 button_pin.irq(trigger=Pin.IRQ_RISING, handler=request_stop_irq)
-
-
 # main program loop
 
 while True:
@@ -121,7 +124,6 @@ while True:
     
     # Reset stop flag at start of each run
     STOP_REQUESTED = False
-
     # 2) RESET MEMORY AND STOP MOTORS
     reset_memory()
     stop_motors()
@@ -131,8 +133,9 @@ while True:
     except StopRequested:
         print("Stop requested — stopping motors and restarting.")
         stop_motors()
+        clear_stop()
         # small delay to debounce / give scheduled exceptions time to clear
-        sleep(0.1)
+        sleep(0.3)
         continue
     
 

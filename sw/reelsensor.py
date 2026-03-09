@@ -1,51 +1,59 @@
-from machine import Pin, ADC
+from machine import Pin, I2C
 from utime import sleep
+from VL53L0X import VL53L0X
 
-from line_logic import LEFT, RIGHT, NO_TURN, T
+from line_logic import LEFT, RIGHT, NO_TURN, T, FORWARD, REVERSE
 
 THRESHOLD_DIST = 300  # Distance threshold in mm - adjust based on testing
 
 
 class ReelSensor:
-    def __init__(self, leftReelSensorPin, rightReelSensorPin):
+    def __init__(self, leftReelSDA, leftReelSCL, rightReelSDA, rightReelSCL):
         """
         Initialize reel sensors.
-        Will attempt to use ADC for analog distance sensors, fallback to digital pins.
         """
-        self.is_analog = False
         
-        try:
-            # Try to initialize as analog inputs (distance sensors)
-            self.leftReelSensor = ADC(Pin(leftReelSensorPin))
-            self.rightReelSensor = ADC(Pin(rightReelSensorPin))
-            self.is_analog = True
-            print("Reel sensors initialized as analog (ADC)")
-        except:
-            # Fallback to digital pins
-            self.leftReelSensor = Pin(leftReelSensorPin, Pin.IN)
-            self.rightReelSensor = Pin(rightReelSensorPin, Pin.IN)
-            print("Reel sensors initialized as digital pins")
+        # leftI2C = I2C(id=0, sda=Pin(leftReelSDA), scl=Pin(leftReelSCL)) # I2C0 on GP8 & GP9
+        rightI2C = I2C(id=1, sda=Pin(rightReelSDA), scl=Pin(rightReelSCL)) #enable when 
+        self.distSensors = [VL53L0X(rightI2C)]
+        # self.distSensors.insert(0, VL53L0X(leftI2C))
         
-        self.reelSensors = [self.leftReelSensor, self.rightReelSensor]
+        # try:
+        #     # Try to initialize as analog inputs (distance sensors)
+        #     self.leftReelSensor = ADC(Pin(leftReelSensorPin))
+        #     self.rightReelSensor = ADC(Pin(rightReelSensorPin))
+        #     self.is_analog = True
+        #     print("Reel sensors initialized as analog (ADC)")
+        # except:
+        #     # Fallback to digital pins
+        #     self.leftReelSensor = Pin(leftReelSensorPin, Pin.IN)
+        #     self.rightReelSensor = Pin(rightReelSensorPin, Pin.IN)
+        #     print("Reel sensors initialized as digital pins")
+
+        for Sensor in distSensors:
+            Sensor.set_Vcsel_pulse_period(vl53l0.vcsel_period_type[0], 18)
+            Sensor.set_Vcsel_pulse_period(vl53l0.vcsel_period_type[1], 14)
+
 
     def get_distance(self, side):
-        """
-        Get distance reading from specified reel sensor.
+        print("getting distance from side ", side)
+        sensor = self.distSensors[side]
+        # Start device
+        sensor.start()
+        distSamples = []
+        # Read ten samples
+        for _ in range(3):
+            distance = sensor.read()
+            print(f"Distance = {distance}mm")  # Check calibration!
+            distSamples.append(distance)
+            sleep(0.1)
         
-        Args:
-            side: LEFT (0) or RIGHT (1)
+        # Stop device
+        sensor.stop()
+        averageDist = sum(distSamples) / len(distSamples)
+        print("avg dist: ", averageDist)
+        return averageDist
         
-        Returns:
-            Distance value (0-65535 for ADC, 0-1 for digital)
-        """
-        try:
-            if self.is_analog:
-                return self.reelSensors[side].read_u16()
-            else:
-                return self.reelSensors[side].value()
-        except Exception as e:
-            print(f"Sensor read error: {e}")
-            return 999999  # Return high value to avoid false positives
 
     def check_reel_detected(self, side):
         """
@@ -58,5 +66,30 @@ class ReelSensor:
             True if distance below threshold, False otherwise
         """
         distance = self.get_distance(side)
+        if (distance < THRESHOLD_DIST):
+            print("something there...")
+        else:
+            print('nothing burger')
         return distance < THRESHOLD_DIST
+
+
+    def grab(self, line, side):
+        line.turnLogic(turnDirection=side)
+        while line.leftOn and line.rightOn:
+            line.lineFollow(FORWARD)
+        for motor in line.motors:
+            motor.off()
+        # TODO grabber logic
+
+        for i in range(len(line.motors)):
+            motor.Reverse(side=i, speed=10)
+
+        while not (line.leftOn and line.rightOn):
+            sleep(0.1)
+        
+        while not line.leftTurn and line.rightTurn:
+            line.lineFollow(REVERSE)
+            line.turnLogic(turnDirection=side)
+            
+
             

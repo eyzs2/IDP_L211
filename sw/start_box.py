@@ -1,5 +1,5 @@
 from utime import sleep, ticks_ms, ticks_diff
-from line_logic import LineSensor
+from line_logic import LineSensor, FORWARD, REVERSE
 
 LEFT = 0
 RIGHT = 1
@@ -33,9 +33,9 @@ def exit_start_box(line:LineSensor, motors, motorspeed=25, confirm_ms=120, timeo
             elif ticks_diff(ticks_ms(), confirm_start) > confirm_ms:
                 print("Line confirmed. Exiting start box...")
                 while (line.turnSense[LEFT].value() or line.turnSense[RIGHT].value()):
-                    line.lineFollow(motors)
+                    line.lineFollow(motors, FORWARD)
                 while not (line.turnSense[LEFT].value() and line.turnSense[RIGHT].value()):
-                    line.lineFollow(motors)
+                    line.lineFollow(motors, FORWARD)
 
                 motors[LEFT].off()
                 motors[RIGHT].off()
