@@ -1,5 +1,5 @@
 from machine import Pin, I2C
-from libs.VL53L0X.VL53L0X import VL53L0X
+from VL53L0X import VL53L0X
 from utime import sleep
 
 def test_vl53l0x():
@@ -27,6 +27,8 @@ def test_vl53l0x():
         
         # Stop device
         vl53l0.stop()
+        sleep(3)
+        break
 
 
 if __name__ == "__main__":

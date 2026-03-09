@@ -14,19 +14,21 @@ REVERSE = 1
 
 
 class LineSensor:
-    def __init__(self, leftOnPin, rightOnPin, leftTurnPin, rightTurnPin):
+    def __init__(self, leftOnPin, rightOnPin, leftTurnPin, rightTurnPin, motors):
         self.leftOn = Pin(leftOnPin, Pin.IN, Pin.PULL_DOWN)
         self.rightOn = Pin(rightOnPin, Pin.IN, Pin.PULL_DOWN)
         self.leftTurn = Pin(leftTurnPin, Pin.IN, Pin.PULL_DOWN)
         self.rightTurn = Pin(rightTurnPin, Pin.IN, Pin.PULL_DOWN)
+        self.motors = motors
         self.lineSense = [self.leftOn, self.rightOn]
         self.turnSense = [self.leftTurn, self.rightTurn]
         self.loopCompletion = False
    
 
-    def lineFollow(self, motors, direction): # define 0 left, 1 right
+    def lineFollow(self, direction): # define 0 left, 1 right
         
         stop_function()
+        motors = self.motors
         lineSense = self.lineSense
         
         # Check if either sensor is off the line
@@ -50,8 +52,9 @@ class LineSensor:
                 motors[RIGHT].Forward(side=RIGHT, speed=60)
         sleep(0.01)
 
-    def turnLogic(self, turnDirection, motors):
+    def turnLogic(self, turnDirection):
         stop_function()
+        motors = self.motors
         turnSense = self.turnSense
 
         turnDetection = NO_TURN

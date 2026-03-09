@@ -74,7 +74,7 @@ def run_line_following_test(motors, line: LineSensor, reel_sensor: ReelSensor = 
     first_right_turn_complete = False
 
     while True:
-        line.lineFollow(motors)
+        line.lineFollow(motors, 0)
         
         # Check for right junctions/turns
         if line.turnSense[RIGHT].value():

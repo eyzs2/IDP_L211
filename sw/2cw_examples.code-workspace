@@ -20,6 +20,7 @@
 			"css",
 			"mpy",
 			"hex"
-		]
+		],
+		"editor.semanticHighlighting.enabled": true
 	}
 }
