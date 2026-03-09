@@ -78,11 +78,12 @@ line = LineSensor(
 
 
 # Reel sensor object
+'''
 reel = ReelSensor(
     leftReelSensorPin=LEFT_REEL_SENSOR_PIN,
     rightReelSensorPin=RIGHT_REEL_SENSOR_PIN
 )
-
+'''
 
 # helper functions
 def reset_memory():
