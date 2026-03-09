@@ -25,12 +25,66 @@ class LineSensor:
         self.loopCompletion = False
    
 
-    def lineFollow(self, direction): # define 0 left, 1 right
-        
+    # function to ensure robot stays on course following the line
+    def lineFollow(self, direction):
         stop_function()
         motors = self.motors
         lineSense = self.lineSense
-        
+
+        left_on = lineSense[LEFT].value()
+        right_on = lineSense[RIGHT].value()
+
+        # sets base speeds for motors 
+        fast_speed = 60 
+        slow_speed = 35
+
+        # chooses movement functions based on direction
+        if direction == REVERSE:
+            def fast(side):
+                motors[side].Reverse(side=side, speed=fast_speed)
+
+            def slow(side):
+                motors[side].Reverse(side=side, speed=slow_speed)
+
+            def opposite(side):
+                motors[side].Forward(side=side, speed=fast_speed)
+        else:
+            def fast(side):
+                motors[side].Forward(side=side, speed=fast_speed)
+
+            def slow(side):
+                motors[side].Forward(side=side, speed=slow_speed)
+
+            def opposite(side):
+                motors[side].Reverse(side=side, speed=fast_speed)
+
+        # both sensors on line, travels straight at fast speed
+        if left_on and right_on:
+            fast(LEFT)
+            fast(RIGHT)
+
+        # left off, correct by slowing right
+        elif not left_on and right_on:
+            fast(LEFT)
+            slow(RIGHT)
+
+        # left on, correct by slowing left
+        elif left_on and not right_on:
+            slow(LEFT)
+            fast(RIGHT)
+
+        # both off, travel in opp direction for 0.5 seconds
+        else:
+            opposite(LEFT)
+            opposite(RIGHT)
+            sleep(0.5)
+            stop_function()
+            return
+
+        sleep(0.01)
+
+
+'''
         # Check if either sensor is off the line
         if not lineSense[LEFT].value() or not lineSense[RIGHT].value():
             # Find which sensor is off
@@ -51,6 +105,7 @@ class LineSensor:
                 motors[LEFT].Forward(side=LEFT, speed=60)
                 motors[RIGHT].Forward(side=RIGHT, speed=60)
         sleep(0.01)
+'''
 
     def turnLogic(self, turnDirection):
         stop_function()

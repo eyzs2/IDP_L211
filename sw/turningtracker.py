@@ -3,7 +3,10 @@ from line_logic import LineSensor, LEFT, RIGHT, NO_TURN, T
 from start_box import exit_start_box
 from reelsensor import ReelSensor
 
-
+def _stop_motors(motors):
+    motors[LEFT].off()
+    motors[RIGHT].off()
+    
 def run_turning_tracker(motors, line: LineSensor):
     rightTurns = {1, 9, 11, 19}
     leftTurns = {2}
@@ -127,9 +130,9 @@ def run_turning_tracker(motors, line: LineSensor):
             if right_any_count in rightTurns:
                 print("SCHEDULE: RIGHT turn at", right_any_count)
                 _stop_motors(motors)
-                line.turnLogic(turnDirection=RIGHT, motors=motors)
+                line.turnLogic(turnDirection=RIGHT)
 
             if left_any_count in leftTurns:
                 print("SCHEDULE: LEFT turn at", left_any_count)
                 _stop_motors(motors)
-                line.turnLogic(turnDirection=LEFT, motors=motors)
+                line.turnLogic(turnDirection=LEFT)
