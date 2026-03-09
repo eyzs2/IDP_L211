@@ -4,7 +4,7 @@ from line_logic import LineSensor, FORWARD, REVERSE
 LEFT = 0
 RIGHT = 1
 
-def exit_start_box(line:LineSensor, motors, motorspeed=25, confirm_ms=120, timeout_ms=2000):
+def exit_start_box(line:LineSensor, motors, motorspeed=35, confirm_ms=120, timeout_ms=4000):
 
     start_time = ticks_ms()
     confirm_start = None
@@ -21,7 +21,7 @@ def exit_start_box(line:LineSensor, motors, motorspeed=25, confirm_ms=120, timeo
 
          # both must be true (white)
         if left_turn_on_line and right_turn_on_line:
-            
+
             if confirm_start is None:
                 print("Line detected, confirming...")
                 confirm_start = ticks_ms()

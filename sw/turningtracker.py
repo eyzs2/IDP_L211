@@ -10,7 +10,7 @@ def _stop_motors(motors):
     motors[RIGHT].off()
     
 def run_turning_tracker(motors, line: LineSensor):
-    rightTurns = {1, 9, 11, 19}
+    rightTurns = {3, 9, 11, 19}
     leftTurns = {2}
 
     # counts
@@ -118,6 +118,8 @@ def run_turning_tracker(motors, line: LineSensor):
                     clear_L_start = None
             else:
                 clear_L_start = None
+
+
 
         # -------- Print + scheduled turns ONLY when a new event fired --------
         if event_fired:
