@@ -26,7 +26,7 @@ class LineSensor:
    
 
     # function to ensure robot stays on course following the line
-    def lineFollow(self, direction):
+    def lineFollow(self, direction = FORWARD):
         stop_function()
         motors = self.motors
         lineSense = self.lineSense

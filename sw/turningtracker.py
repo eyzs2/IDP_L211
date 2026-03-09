@@ -3,6 +3,7 @@ from line_logic import LineSensor, LEFT, RIGHT, NO_TURN, T, FORWARD, REVERSE
 from motor import Motor
 from start_box import exit_start_box
 from reelsensor import ReelSensor
+from pushbutton_logic import stop_function
 
 def _stop_motors(motors):
     motors[LEFT].off()

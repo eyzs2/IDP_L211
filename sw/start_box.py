@@ -21,8 +21,6 @@ def exit_start_box(line:LineSensor, motors, motorspeed=25, confirm_ms=120, timeo
 
          # both must be true (white)
         if left_turn_on_line and right_turn_on_line:
-
-
             
             if confirm_start is None:
                 print("Line detected, confirming...")
@@ -33,9 +31,9 @@ def exit_start_box(line:LineSensor, motors, motorspeed=25, confirm_ms=120, timeo
             elif ticks_diff(ticks_ms(), confirm_start) > confirm_ms:
                 print("Line confirmed. Exiting start box...")
                 while (line.turnSense[LEFT].value() or line.turnSense[RIGHT].value()):
-                    line.lineFollow(FORWARD)
+                    line.lineFollow()
                 while not (line.turnSense[LEFT].value() and line.turnSense[RIGHT].value()):
-                    line.lineFollow(FORWARD)
+                    line.lineFollow()
 
                 motors[LEFT].off()
                 motors[RIGHT].off()

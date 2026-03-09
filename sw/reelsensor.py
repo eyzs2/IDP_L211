@@ -14,7 +14,8 @@ class ReelSensor:
         """
         
         # leftI2C = I2C(id=0, sda=Pin(leftReelSDA), scl=Pin(leftReelSCL)) # I2C0 on GP8 & GP9
-        rightI2C = I2C(id=1, sda=Pin(rightReelSDA), scl=Pin(rightReelSCL)) #enable when 
+        rightI2C = I2C(id=0, sda=Pin(rightReelSDA), scl=Pin(rightReelSCL)) #CHANGE TO ID 1 WHEN OTHER SENSOR CONNECTED
+        print("i2c initialised?")
         self.distSensors = [VL53L0X(rightI2C)]
         # self.distSensors.insert(0, VL53L0X(leftI2C))
         
@@ -30,19 +31,20 @@ class ReelSensor:
         #     self.rightReelSensor = Pin(rightReelSensorPin, Pin.IN)
         #     print("Reel sensors initialized as digital pins")
 
-        for Sensor in distSensors:
-            Sensor.set_Vcsel_pulse_period(vl53l0.vcsel_period_type[0], 18)
-            Sensor.set_Vcsel_pulse_period(vl53l0.vcsel_period_type[1], 14)
+        for Sensor in self.distSensors:
+            Sensor.set_Vcsel_pulse_period(Sensor.vcsel_period_type[0], 18)
+            Sensor.set_Vcsel_pulse_period(Sensor.vcsel_period_type[1], 14)
 
 
     def get_distance(self, side):
         print("getting distance from side ", side)
+        side = 0 # TO REMOVE WHEN BOTH SENSORS CONNECTED
         sensor = self.distSensors[side]
         # Start device
         sensor.start()
         distSamples = []
         # Read ten samples
-        for _ in range(3):
+        for _ in range(4):
             distance = sensor.read()
             print(f"Distance = {distance}mm")  # Check calibration!
             distSamples.append(distance)
@@ -50,6 +52,7 @@ class ReelSensor:
         
         # Stop device
         sensor.stop()
+        distSamples.pop(0)
         averageDist = sum(distSamples) / len(distSamples)
         print("avg dist: ", averageDist)
         return averageDist
@@ -76,7 +79,7 @@ class ReelSensor:
     def grab(self, line, side):
         line.turnLogic(turnDirection=side)
         while line.leftOn and line.rightOn:
-            line.lineFollow(FORWARD)
+            line.lineFollow()
         for motor in line.motors:
             motor.off()
         # TODO grabber logic
