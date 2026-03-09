@@ -37,7 +37,7 @@ def run_turning_tracker(motors, line: LineSensor):
 
     # main loop
     while True:
-        line.lineFollow(motors)
+        line.lineFollow(DIRECTION)
 
         L = rear_L()
         R = rear_R()
@@ -131,8 +131,10 @@ def run_turning_tracker(motors, line: LineSensor):
                 print("SCHEDULE: RIGHT turn at", right_any_count)
                 _stop_motors(motors)
                 line.turnLogic(turnDirection=RIGHT)
+                sleep(0.1) # give time to clear turn before next event
 
             if left_any_count in leftTurns:
                 print("SCHEDULE: LEFT turn at", left_any_count)
                 _stop_motors(motors)
                 line.turnLogic(turnDirection=LEFT)
+                sleep(0.1) # give time to clear turn before next event

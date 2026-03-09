@@ -84,29 +84,7 @@ class LineSensor:
         sleep(0.01)
 
 
-'''
-        # Check if either sensor is off the line
-        if not lineSense[LEFT].value() or not lineSense[RIGHT].value():
-            # Find which sensor is off
-            for i in range(len(lineSense)):
-                stop_function()
-                if not lineSense[i].value():
-                    # Turn down opposite side speed only until BOTH sensors back on
-                    opposite = (i+1) % 2
-                    motors[i].Forward(side=i, speed=60)  # retain other side speed
-                    motors[opposite].Forward(side=opposite, speed=35)  # Reduced speed on opposite
-                    sleep(0.01)
-
-        else:
-            if direction == REVERSE:
-                motors[LEFT].Reverse(side=LEFT, speed=60)
-                motors[RIGHT].Reverse(side=RIGHT, speed=60)
-            else:
-                motors[LEFT].Forward(side=LEFT, speed=60)
-                motors[RIGHT].Forward(side=RIGHT, speed=60)
-        sleep(0.01)
-'''
-
+    # function to execute turns at junctions based on turn tracker
     def turnLogic(self, turnDirection):
         stop_function()
         motors = self.motors
@@ -114,29 +92,32 @@ class LineSensor:
 
         turnDetection = NO_TURN
 
+        # detecting T-junctions 
         if turnSense[LEFT].value() and turnSense[RIGHT].value():
             sleep(0.05)
             if turnSense[LEFT].value() and turnSense[RIGHT].value(): #verification
                 turnDetection = T
 
+        # detection of left or right only turns 
         for i in range(len(turnSense)):
             if turnSense[i].value() and not turnSense[(i+1)%2].value(): # If one side turn is detected, verify after T
                 sleep(0.05)
                 if turnSense[i].value():
                     turnDetection = i # else treat as corner
-            
+                    break 
+
         if turnDetection != NO_TURN:
-            # if override != None: # if override present, turn direction set as override
-            #     turnDirection = override
-            
             print("turn detected", "turn type: ", turnDetection)
             stop_function()
+
             if turnDetection == T or turnDetection == turnDirection:
                 motors[LEFT].off()
                 motors[RIGHT].off()
-                sleep(1)  # brief pause to let robot stop before turning
+                sleep(0.5)  # brief pause to let robot stop before turning
+
                 # execute turn based on predetermined outcome (loop)
                 print("turning ", "type: ", turnDirection)
+
                 motors[turnDirection].Forward(side=turnDirection, speed=2)  # change turn speed here as needed
                 motors[(turnDirection+1) % 2].Forward(side=(turnDirection+1) % 2, speed=80)
 
@@ -151,7 +132,7 @@ class LineSensor:
 
                 motors[LEFT].off()
                 motors[RIGHT].off()
-                sleep(1.0)
+                sleep(0.5)
 
                 print("turn complete")
             else:
