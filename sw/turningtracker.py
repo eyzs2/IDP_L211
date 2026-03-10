@@ -40,6 +40,7 @@ def run_turning_tracker(motors, line: LineSensor, reel):
 
     # main loop
     while True:
+        side = 0
         line.lineFollow(FORWARD)
 
         L = rear_L()
@@ -56,9 +57,7 @@ def run_turning_tracker(motors, line: LineSensor, reel):
                 t_count += 1
                 right_any_count += 1
                 left_any_count += 1
-                lockout_T = True
-                lockout_R = True
-                lockout_L = True
+                lockout_T = lockout_R = lockout_L = True
                 clear_T_start = clear_R_start = clear_L_start = None
 
                 event_fired = True
@@ -154,8 +153,8 @@ def run_turning_tracker(motors, line: LineSensor, reel):
                 line.turnLogic(turnDirection=RIGHT)
                 sleep(0.1) # give time to clear turn before next event
 
-            if left_any_count in leftTurns:
-                print("SCHEDULE: LEFT turn at", left_any_count)
-                _stop_motors(motors)
-                line.turnLogic(turnDirection=LEFT)
-                sleep(0.1) # give time to clear turn before next event
+        #     if left_any_count in leftTurns:
+        #         print("SCHEDULE: LEFT turn at", left_any_count)
+        #         _stop_motors(motors)
+        #         line.turnLogic(turnDirection=LEFT)
+        #         sleep(0.1) # give time to clear turn before next event

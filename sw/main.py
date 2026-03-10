@@ -51,6 +51,7 @@ RIGHT_REEL_SDA_PIN = 10
 RIGHT_REEL_SCL_PIN = 11
 
 
+
 # memory variables to store state about the mission:
 
 racks_visited = []
@@ -78,6 +79,7 @@ line = LineSensor(
     rightTurnPin=RIGHT_TURN_PIN,
     motors=motors
 )
+
 
 
 # Reel sensor object
