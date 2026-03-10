@@ -85,9 +85,9 @@ line = LineSensor(
 
 # Reel sensor object
 reel = ReelSensor(
-    leftReelSDA=LEFT_REEL_SDA
-    leftReelSCL=LEFT_REEL_SCL
-    rightReelSDA=RIGHT_REEL_SDA
+    leftReelSDA=LEFT_REEL_SDA,
+    leftReelSCL=LEFT_REEL_SCL,
+    rightReelSDA=RIGHT_REEL_SDA,
     rightReelSCL=RIGHT_REEL_SCL
 )
 
