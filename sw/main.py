@@ -45,10 +45,10 @@ RIGHT_MOTOR_PWM = 6
 
 # Reel sensor pins (analog inputs for distance sensors)
 # adjust based on electrical's decisions and testing of reel sensor functionality
-LEFT_REEL_SDA_PIN = 8
-LEFT_REEL_SCL_PIN = 9
-RIGHT_REEL_SDA_PIN = 10
-RIGHT_REEL_SCL_PIN = 11
+LEFT_REEL_SDA_PIN = 10
+LEFT_REEL_SCL_PIN = 11
+RIGHT_REEL_SDA_PIN = 8
+RIGHT_REEL_SCL_PIN = 9
 
 
 

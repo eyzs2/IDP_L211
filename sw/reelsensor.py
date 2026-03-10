@@ -32,15 +32,14 @@ class ReelSensor:
         #     self.rightReelSensor = Pin(rightReelSensorPin, Pin.IN)
         #     print("Reel sensors initialized as digital pins")
 
-        for Sensor in self.distSensors:
-            Sensor.set_Vcsel_pulse_period(Sensor.vcsel_period_type[0], 18)
-            Sensor.set_Vcsel_pulse_period(Sensor.vcsel_period_type[1], 14)
+        for sensor in self.distSensors:
+            sensor.set_Vcsel_pulse_period(sensor.vcsel_period_type[0], 18)
+            sensor.set_Vcsel_pulse_period(sensor.vcsel_period_type[1], 14)
 
-
+    # function below returns average distance
     def get_distance(self, side):
         print("getting distance from side ", side)
-        side = 0 # TO REMOVE WHEN BOTH SENSORS CONNECTED
-        sensor = self.distSensors[side]
+        sensor = self.distSensors[0]
         # Start device
         sensor.start()
         distSamples = []
@@ -53,7 +52,8 @@ class ReelSensor:
         
         # Stop device
         sensor.stop()
-        distSamples.pop(0)
+        if len(distSamples) > 1:
+            distSamples.pop(0)
         averageDist = sum(distSamples) / len(distSamples)
         print("avg dist: ", averageDist)
         return averageDist
@@ -70,32 +70,51 @@ class ReelSensor:
             True if distance below threshold, False otherwise
         """
         distance = self.get_distance(side)
-        if (distance < THRESHOLD_DIST):
+        if distance < THRESHOLD_DIST:
             print("something there...")
+            return True
         else:
-            print('nothing burger')
-        return distance < THRESHOLD_DIST
+            print("no reel detected")
+            return False
 
-    def grab(self, line, grabber, side):
+
+    def grab(self, line, side):
+
+        """
+        Temporary placeholder grab routine.
+
+        Current behaviour:
+        1. Turn toward requested side
+        2. Move forward until front line is lost
+        3. Stop for pickup
+        4. Reverse until front line is found again
+        5. Stop
+
+        Replace the section later with actual grabber actuation.
+        """
+
+        print("Starting grab routine on side", side)
+
+        # turn toward the reel side
         line.turnLogic(turnDirection=side)
+        # move forward while still on line
         while line.leftOn.value() and line.rightOn.value():
-            stop_function()
             line.lineFollow()
         for motor in line.motors:
             motor.off()
+
         # TODO grabber logic
+        print("Pretending to grab...")
+        sleep(0.5)
 
         for i in range(len(line.motors)):
-            line.motors[i].Reverse(side=i, speed=10)
+            line.motors[i].Reverse(side=i, speed=20)
 
-        while not (line.leftOn.value() and line.rightOn.value()):
-            stop_function()
-            sleep(0.1)
-        
-        while not line.leftTurn.value() and line.rightTurn.value():
-            stop_function()
+        while not (line.leftTurn.value() or line.rightTurn.value()):
             line.lineFollow(REVERSE)
-            line.turnLogic(turnDirection=side)
-            
+
+        for motor in line.motors:
+            motor.off()
+                    
 
             
