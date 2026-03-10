@@ -1,6 +1,7 @@
 from machine import Pin, I2C
 from utime import sleep
 from VL53L0X import VL53L0X
+from pushbutton_logic import stop_function
 
 from line_logic import LEFT, RIGHT, NO_TURN, T, FORWARD, REVERSE
 
@@ -78,19 +79,22 @@ class ReelSensor:
 
     def grab(self, line, side):
         line.turnLogic(turnDirection=side)
-        while line.leftOn and line.rightOn:
+        while line.leftOn.value() and line.rightOn.value():
+            stop_function()
             line.lineFollow()
         for motor in line.motors:
             motor.off()
         # TODO grabber logic
 
         for i in range(len(line.motors)):
-            motor.Reverse(side=i, speed=10)
+            line.motors[i].Reverse(side=i, speed=10)
 
-        while not (line.leftOn and line.rightOn):
+        while not (line.leftOn.value() and line.rightOn.value()):
+            stop_function()
             sleep(0.1)
         
-        while not line.leftTurn and line.rightTurn:
+        while not line.leftTurn.value() and line.rightTurn.value():
+            stop_function()
             line.lineFollow(REVERSE)
             line.turnLogic(turnDirection=side)
             

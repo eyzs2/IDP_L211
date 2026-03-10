@@ -47,6 +47,11 @@ RIGHT_MOTOR_PWM = 6
 LEFT_REEL_SENSOR_PIN = 0  # adjust based on electrical team's wiring
 RIGHT_REEL_SENSOR_PIN = 1  # adjust based on electrical team's wiring
 
+LEFT_REEL_SDA = 0 #update UPDATE
+LEFT_REEL_SCL = 0 #UPDATE
+RIGHT_REEL_SDA = 8
+RIGHT_REEL_SCL = 9
+
 
 # memory variables to store state about the mission:
 
@@ -77,13 +82,17 @@ line = LineSensor(
 )
 
 
+
 # Reel sensor object
-'''
 reel = ReelSensor(
-    leftReelSensorPin=LEFT_REEL_SENSOR_PIN,
-    rightReelSensorPin=RIGHT_REEL_SENSOR_PIN
+    leftReelSDA=LEFT_REEL_SDA
+    leftReelSCL=LEFT_REEL_SCL
+    rightReelSDA=RIGHT_REEL_SDA
+    rightReelSCL=RIGHT_REEL_SCL
 )
-'''
+
+
+
 
 # helper functions
 def reset_memory():
@@ -130,7 +139,7 @@ while True:
     try:
         # 3) EXIT START BOX
         exit_start_box(line, motors)
-        run_turning_tracker(motors, line)
+        run_turning_tracker(motors, line, reel)
     except StopRequested:
         print("Stop requested — stopping motors and restarting.")
         stop_motors()

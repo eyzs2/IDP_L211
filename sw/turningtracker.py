@@ -9,7 +9,7 @@ def _stop_motors(motors):
     motors[LEFT].off()
     motors[RIGHT].off()
     
-def run_turning_tracker(motors, line: LineSensor):
+def run_turning_tracker(motors, line: LineSensor, reel:ReelSensor):
     rightTurns = {3, 9, 11, 19}
     leftTurns = {2}
 
@@ -39,6 +39,7 @@ def run_turning_tracker(motors, line: LineSensor):
 
     # main loop
     while True:
+        side = 
         line.lineFollow(FORWARD)
 
         L = rear_L()
@@ -55,9 +56,7 @@ def run_turning_tracker(motors, line: LineSensor):
                 t_count += 1
                 right_any_count += 1
                 left_any_count += 1
-                lockout_T = True
-                lockout_R = True
-                lockout_L = True
+                lockout_T = lockout_R = lockout_L = True
                 clear_T_start = clear_R_start = clear_L_start = None
 
                 event_fired = True
@@ -122,23 +121,23 @@ def run_turning_tracker(motors, line: LineSensor):
 
 
         # -------- Print + scheduled turns ONLY when a new event fired --------
-        if event_fired:
-            print(
-                "EVENT", event_type,
-                "| right_any =", right_any_count,
-                "| left_any =", left_any_count,
-                "| T =", t_count
-            )
+        # if event_fired:
+        #     print(
+        #         "EVENT", event_type,
+        #         "| right_any =", right_any_count,
+        #         "| left_any =", left_any_count,
+        #         "| T =", t_count
+        #     )
 
-            # only turn on scheduled numbers
-            if right_any_count in rightTurns:
-                print("SCHEDULE: RIGHT turn at", right_any_count)
-                _stop_motors(motors)
-                line.turnLogic(turnDirection=RIGHT)
-                sleep(0.1) # give time to clear turn before next event
+        #     # only turn on scheduled numbers
+        #     if right_any_count in rightTurns:
+        #         print("SCHEDULE: RIGHT turn at", right_any_count)
+        #         _stop_motors(motors)
+        #         line.turnLogic(turnDirection=RIGHT)
+        #         sleep(0.1) # give time to clear turn before next event
 
-            if left_any_count in leftTurns:
-                print("SCHEDULE: LEFT turn at", left_any_count)
-                _stop_motors(motors)
-                line.turnLogic(turnDirection=LEFT)
-                sleep(0.1) # give time to clear turn before next event
+        #     if left_any_count in leftTurns:
+        #         print("SCHEDULE: LEFT turn at", left_any_count)
+        #         _stop_motors(motors)
+        #         line.turnLogic(turnDirection=LEFT)
+        #         sleep(0.1) # give time to clear turn before next event
