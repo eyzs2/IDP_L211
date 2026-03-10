@@ -26,16 +26,16 @@ RIGHT_MOTOR = 1
 
 # pin configs (need editing based on electrical teams decisions):
 
-BUTTON_PIN = 15
-led = Pin("LED", Pin.OUT)
+BUTTON_PIN = 22
+# led = Pin("LED", Pin.OUT)
 
 # Front line sensors
-LEFT_ON_PIN = 13
-RIGHT_ON_PIN = 12
+LEFT_ON_PIN = 26
+RIGHT_ON_PIN = 21
 
 # Rear line sensors
 LEFT_TURN_PIN = 27
-RIGHT_TURN_PIN = 28
+RIGHT_TURN_PIN = 20
 
 # Motor pins
 LEFT_MOTOR_DIR = 4
@@ -45,10 +45,10 @@ RIGHT_MOTOR_PWM = 6
 
 # Reel sensor pins (analog inputs for distance sensors)
 # adjust based on electrical's decisions and testing of reel sensor functionality
-LEFT_REEL_SDA_PIN = 10
-LEFT_REEL_SCL_PIN = 11
-RIGHT_REEL_SDA_PIN = 8
-RIGHT_REEL_SCL_PIN = 9
+LEFT_REEL_SDA_PIN = 8
+LEFT_REEL_SCL_PIN = 9
+RIGHT_REEL_SDA_PIN = 10
+RIGHT_REEL_SCL_PIN = 11
 
 
 

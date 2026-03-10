@@ -1,15 +1,15 @@
 
 from reelsensor import ReelSensor
 
-leftReelSDA=0
-leftReelSCL=0
-rightReelSDA=8
-rightReelSCL=9
+leftReelSDA=9
+leftReelSCL=8
+rightReelSDA=11
+rightReelSCL=10
 
 RIGHT = 1
 
 def checktest():
-    sensors = ReelSensor(0,0,8,9)
+    sensors = ReelSensor(8,9,10,11)
     something = sensors.check_reel_detected(RIGHT)
 
 

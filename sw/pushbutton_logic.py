@@ -1,5 +1,6 @@
 from utime import ticks_ms, ticks_diff
 import micropython
+from machine import Pin
 
 class ButtonEdge:
 
@@ -47,4 +48,14 @@ def clear_stop():
 def stop_function():
     if _STOP_REQUESTED:
         raise StopRequested()
-    
+
+
+# button_pin = 22
+
+# if __name__ == '__main__':
+#      start = ticks_ms()
+
+#      button = ButtonEdge(Pin(button_pin, Pin.IN, Pin.PULL_DOWN), debounce_ms=150)
+#      while ticks_diff(ticks_ms(), start) < 10000:
+#         if button.pressed():
+#             print('button pressed!')

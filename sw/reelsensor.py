@@ -3,7 +3,10 @@ from utime import sleep
 from VL53L0X import VL53L0X
 from pushbutton_logic import stop_function
 
+
 from line_logic import LEFT, RIGHT, NO_TURN, T, FORWARD, REVERSE
+
+from grabber import TOP_RACK, BOTTOM_RACK, Grabber
 
 THRESHOLD_DIST = 300  # Distance threshold in mm - adjust based on testing
 
@@ -14,11 +17,10 @@ class ReelSensor:
         Initialize reel sensors.
         """
         
-        # leftI2C = I2C(id=0, sda=Pin(leftReelSDA), scl=Pin(leftReelSCL)) # I2C0 on GP8 & GP9
-        rightI2C = I2C(sda=Pin(rightReelSDA), scl=Pin(rightReelSCL)) #CHANGE TO ID 1 WHEN OTHER SENSOR CONNECTED
+        leftI2C = I2C(id=0, sda=Pin(leftReelSDA), scl=Pin(leftReelSCL)) # type: ignore # I2C0 on GP8 & GP9
+        rightI2C = I2C(id=1, sda=Pin(rightReelSDA), scl=Pin(rightReelSCL)) # type: ignore #CHANGE TO ID 1 WHEN OTHER SENSOR CONNECTED
         print("i2c initialised?")
-        self.distSensors = [VL53L0X(rightI2C)]
-        # self.distSensors.insert(0, VL53L0X(leftI2C))
+        self.distSensors = [VL53L0X(leftI2C),VL53L0X(rightI2C)]
         
         # try:
         #     # Try to initialize as analog inputs (distance sensors)
@@ -39,7 +41,7 @@ class ReelSensor:
     # function below returns average distance
     def get_distance(self, side):
         print("getting distance from side ", side)
-        sensor = self.distSensors[0]
+        sensor = self.distSensors[side]
         # Start device
         sensor.start()
         distSamples = []
@@ -78,7 +80,7 @@ class ReelSensor:
             return False
 
 
-    def grab(self, line, side):
+    def grab(self, line, grabber:Grabber, side):
 
         """
         Temporary placeholder grab routine.
@@ -97,15 +99,21 @@ class ReelSensor:
 
         # turn toward the reel side
         line.turnLogic(turnDirection=side)
+        stop_function()
+
+        grabber.grabber_align(BOTTOM_RACK)
         # move forward while still on line
         while line.leftOn.value() and line.rightOn.value():
+            stop_function()
             line.lineFollow()
         for motor in line.motors:
             motor.off()
 
         # TODO grabber logic
-        print("Pretending to grab...")
-        sleep(0.5)
+        # print("Pretending to grab...")
+        # sleep(0.5)
+        reel = grabber.pickup()
+
 
         for i in range(len(line.motors)):
             line.motors[i].Reverse(side=i, speed=20)

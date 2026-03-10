@@ -1,5 +1,5 @@
 from machine import Pin
-from utime import sleep
+from utime import sleep, ticks_diff, ticks_ms
 from pushbutton_logic import stop_function
 
 # Line functionality --> going on line from start box (initial state), staying on line (steady state), junction logic (interrupt)
@@ -138,3 +138,39 @@ class LineSensor:
             else:
                 print("non-loop turn detected!")
 
+
+# def test_line_sensors():
+#     # Front line sensors
+#     left_on_pin = 26
+#     right_on_pin = 21
+
+#     # Rear line sensors
+#     left_turn_pin = 27
+#     right_turn_pin = 20
+#     motors = []
+    
+#     line = LineSensor(leftOnPin=left_on_pin,
+#     rightOnPin=right_on_pin,
+#     leftTurnPin=left_turn_pin,
+#     rightTurnPin=right_turn_pin,
+#     motors=motors)
+
+#     start_time = ticks_ms()
+
+#     while ticks_diff(ticks_ms(), start_time) < 10000:
+#         if line.leftOn.value():
+#             print('left front on!')
+
+#         if line.rightOn.value():
+#             print('right front on!')
+
+#         if line.leftTurn.value():
+#             print('left turn')
+        
+#         if line.rightTurn.value():
+#             print('right turn')
+            
+
+
+# if __name__ == '__main__':
+#     test_line_sensors()

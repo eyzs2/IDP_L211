@@ -2,13 +2,16 @@ from line_logic import LineSensor
 from motor import Motor
 from utime import ticks_ms, sleep
 
+BUTTON_PIN = 22
+# led = Pin("LED", Pin.OUT)
+
 # Front line sensors
-LEFT_ON_PIN = 13
-RIGHT_ON_PIN = 12
+LEFT_ON_PIN = 26
+RIGHT_ON_PIN = 21
 
 # Rear line sensors
 LEFT_TURN_PIN = 27
-RIGHT_TURN_PIN = 28
+RIGHT_TURN_PIN = 20
 
 # Motor pins
 LEFT_MOTOR_DIR = 4
@@ -16,8 +19,12 @@ LEFT_MOTOR_PWM = 5
 RIGHT_MOTOR_DIR = 7
 RIGHT_MOTOR_PWM = 6
 
-LEFT_REEL_SENSOR = 0
-RIGHT_REEL_SENSOR = 0
+# Reel sensor pins (analog inputs for distance sensors)
+# adjust based on electrical's decisions and testing of reel sensor functionality
+LEFT_REEL_SDA_PIN = 8
+LEFT_REEL_SCL_PIN = 9
+RIGHT_REEL_SDA_PIN = 10
+RIGHT_REEL_SCL_PIN = 11
 
 LEFT = 0
 RIGHT = 1
@@ -39,16 +46,16 @@ def lineLogicTest():
 
     start_time = ticks_ms()
     now = ticks_ms()
-    motors[LEFT].Forward(side=LEFT, speed=60)
-    motors[RIGHT].Forward(side=RIGHT, speed=60)
+    line.motors[LEFT].Forward(side=LEFT, speed=60)
+    line.motors[RIGHT].Forward(side=RIGHT, speed=60)
 
     while now - start_time < 15000:
         now = ticks_ms()
         line.turnLogic(turnDirection=RIGHT)
-        line.lineFollow(motors, FORWARD)
+        line.lineFollow()
 
-    motors[LEFT].off()
-    motors[RIGHT].off()
+    line.motors[LEFT].off()
+    line.motors[RIGHT].off()
 
     print("time up")
 
