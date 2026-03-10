@@ -9,9 +9,10 @@ def _stop_motors(motors):
     motors[LEFT].off()
     motors[RIGHT].off()
     
-def run_turning_tracker(motors, line: LineSensor, reel:ReelSensor):
+def run_turning_tracker(motors, line: LineSensor, reel):
     rightTurns = {3, 9, 11, 19}
     leftTurns = {2}
+    reelCheckRights = {4, 5, 6, 7, 8, 9}
 
     # counts
     right_any_count = 0   # RIGHT sensor high (includes T)
@@ -39,7 +40,7 @@ def run_turning_tracker(motors, line: LineSensor, reel:ReelSensor):
 
     # main loop
     while True:
-        side = 
+        side = 0
         line.lineFollow(FORWARD)
 
         L = rear_L()
@@ -120,21 +121,37 @@ def run_turning_tracker(motors, line: LineSensor, reel:ReelSensor):
 
 
 
-        # -------- Print + scheduled turns ONLY when a new event fired --------
-        # if event_fired:
-        #     print(
-        #         "EVENT", event_type,
-        #         "| right_any =", right_any_count,
-        #         "| left_any =", left_any_count,
-        #         "| T =", t_count
-        #     )
+        # Print + scheduled turns ONLY when a new event fired 
+        if event_fired:
+            print(
+                "EVENT", event_type,
+                "| right_any =", right_any_count,
+                "| left_any =", left_any_count,
+                "| T =", t_count
+            )
 
-        #     # only turn on scheduled numbers
-        #     if right_any_count in rightTurns:
-        #         print("SCHEDULE: RIGHT turn at", right_any_count)
-        #         _stop_motors(motors)
-        #         line.turnLogic(turnDirection=RIGHT)
-        #         sleep(0.1) # give time to clear turn before next event
+            if right_any_count in reelCheckRights:
+                print("REEL CHECK at right count", right_any_count)
+                _stop_motors(motors)
+                sleep(0.2) # might need to adjust
+
+                if reel.check_reel_detected(RIGHT):
+                    print("REEL DETECTED - starting grab")
+                    reelCheckRights.remove(right_any_count)
+                    reel.grab(line, RIGHT)
+                    sleep(0.1) # might need to adjust
+                    continue
+                else:
+                    print("No reel found")
+                    reelCheckRights.remove(right_any_count)
+                    sleep(0.1) # might need to adjust
+
+            # only turn on scheduled numbers
+            if right_any_count in rightTurns:
+                print("SCHEDULE: RIGHT turn at", right_any_count)
+                _stop_motors(motors)
+                line.turnLogic(turnDirection=RIGHT)
+                sleep(0.1) # give time to clear turn before next event
 
         #     if left_any_count in leftTurns:
         #         print("SCHEDULE: LEFT turn at", left_any_count)

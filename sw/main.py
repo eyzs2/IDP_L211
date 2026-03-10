@@ -44,13 +44,12 @@ RIGHT_MOTOR_DIR = 7
 RIGHT_MOTOR_PWM = 6
 
 # Reel sensor pins (analog inputs for distance sensors)
-LEFT_REEL_SENSOR_PIN = 0  # adjust based on electrical team's wiring
-RIGHT_REEL_SENSOR_PIN = 1  # adjust based on electrical team's wiring
+# adjust based on electrical's decisions and testing of reel sensor functionality
+LEFT_REEL_SDA_PIN = 8
+LEFT_REEL_SCL_PIN = 9
+RIGHT_REEL_SDA_PIN = 10
+RIGHT_REEL_SCL_PIN = 11
 
-LEFT_REEL_SDA = 0 #update UPDATE
-LEFT_REEL_SCL = 0 #UPDATE
-RIGHT_REEL_SDA = 8
-RIGHT_REEL_SCL = 9
 
 
 # memory variables to store state about the mission:
@@ -84,14 +83,13 @@ line = LineSensor(
 
 
 # Reel sensor object
+
 reel = ReelSensor(
-    leftReelSDA=LEFT_REEL_SDA,
-    leftReelSCL=LEFT_REEL_SCL,
-    rightReelSDA=RIGHT_REEL_SDA,
-    rightReelSCL=RIGHT_REEL_SCL
+    leftReelSDA=LEFT_REEL_SDA_PIN,
+    leftReelSCL=LEFT_REEL_SCL_PIN,
+    rightReelSDA=RIGHT_REEL_SDA_PIN,
+    rightReelSCL=RIGHT_REEL_SCL_PIN
 )
-
-
 
 
 # helper functions
