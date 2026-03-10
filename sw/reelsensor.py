@@ -15,7 +15,7 @@ class ReelSensor:
         """
         
         # leftI2C = I2C(id=0, sda=Pin(leftReelSDA), scl=Pin(leftReelSCL)) # I2C0 on GP8 & GP9
-        rightI2C = I2C(id=0, sda=Pin(rightReelSDA), scl=Pin(rightReelSCL)) #CHANGE TO ID 1 WHEN OTHER SENSOR CONNECTED
+        rightI2C = I2C(sda=Pin(rightReelSDA), scl=Pin(rightReelSCL)) #CHANGE TO ID 1 WHEN OTHER SENSOR CONNECTED
         print("i2c initialised?")
         self.distSensors = [VL53L0X(rightI2C)]
         # self.distSensors.insert(0, VL53L0X(leftI2C))
@@ -76,8 +76,7 @@ class ReelSensor:
             print('nothing burger')
         return distance < THRESHOLD_DIST
 
-
-    def grab(self, line, side):
+    def grab(self, line, grabber, side):
         line.turnLogic(turnDirection=side)
         while line.leftOn.value() and line.rightOn.value():
             stop_function()
