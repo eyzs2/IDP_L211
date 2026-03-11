@@ -73,11 +73,11 @@ class LineSensor:
             slow(LEFT)
             fast(RIGHT)
 
-        # both off, travel in opp direction for 0.5 seconds
+      #   both off, travel in opp direction for 0.5 seconds
         else:
             opposite(LEFT)
             opposite(RIGHT)
-            sleep(0.2)
+            sleep(0.1)
             stop_function()
             return
 
