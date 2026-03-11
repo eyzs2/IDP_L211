@@ -46,7 +46,7 @@ def run_turning_tracker(motors, line: LineSensor, reel):
         L = rear_L()
         R = rear_R()
 
-        # -------- Detect & count events (only once per physical junction) --------
+        # Detect & count events only once per physical junction
         event_fired = False
         event_type = None
 
@@ -85,7 +85,6 @@ def run_turning_tracker(motors, line: LineSensor, reel):
                 event_fired = True
                 event_type = "L"
 
-        # -------- Unlock logic --------
         # Unlock T when not (L and R) for long enough
         if lockout_T:
             if not (rear_L() and rear_R()):
@@ -118,7 +117,6 @@ def run_turning_tracker(motors, line: LineSensor, reel):
                     clear_L_start = None
             else:
                 clear_L_start = None
-
 
 
         # Print + scheduled turns ONLY when a new event fired 
