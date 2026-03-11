@@ -10,9 +10,9 @@ def _stop_motors(motors):
     motors[RIGHT].off()
     
 def run_turning_tracker(motors, line: LineSensor, reel):
-    rightTurns = {3, 9, 11, 19}
+    rightTurns = {3, 12, 19}
     leftTurns = {2}
-    reelCheckRights = {5, 6, 7, 8, 9}
+    reelCheckRights = {5, 6, 7, 8, 9, 10}
 
     # counts
     right_any_count = 0   # RIGHT sensor high (includes T)
