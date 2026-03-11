@@ -13,7 +13,7 @@ from line_logic import LineSensor, LEFT, RIGHT, T, NO_TURN
 from start_box import exit_start_box
 from pushbutton_logic import ButtonEdge, request_stop_irq, StopRequested, clear_stop
 # from test_linelogic import lineLogicTest
-from turningtracker import run_turning_tracker
+from turning_tracker import run_turning_tracker
 
 # Mode A = Turn LEFT at first T junction
 # Mode B = Turn RIGHT at first T junction
