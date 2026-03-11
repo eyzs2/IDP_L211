@@ -77,7 +77,7 @@ class LineSensor:
         else:
             opposite(LEFT)
             opposite(RIGHT)
-            sleep(0.5)
+            sleep(0.2)
             stop_function()
             return
 

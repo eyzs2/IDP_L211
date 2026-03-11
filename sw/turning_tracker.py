@@ -28,8 +28,8 @@ def run_turning_tracker(motors, line: LineSensor, reel):
     clear_L_start = None
     clear_T_start = None
 
-    DEBOUNCE_S = 0.3
-    CLEAR_CONFIRM_MS = 200
+    DEBOUNCE_S = 0.1
+    CLEAR_CONFIRM_MS = 150
 
     # helpers
     def rear_L():
