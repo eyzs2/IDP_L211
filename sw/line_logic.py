@@ -47,7 +47,7 @@ class LineSensor:
                 motors[side].Reverse(side=side, speed=slow_speed)
 
             def opposite(side):
-                motors[side].Forward(side=side, speed=fast_speed)
+                motors[side].Forward(side=side, speed=slow_speed)
         else:
             def fast(side):
                 motors[side].Forward(side=side, speed=fast_speed)
@@ -56,7 +56,7 @@ class LineSensor:
                 motors[side].Forward(side=side, speed=slow_speed)
 
             def opposite(side):
-                motors[side].Reverse(side=side, speed=fast_speed)
+                motors[side].Reverse(side=side, speed=slow_speed)
 
         # both sensors on line, travels straight at fast speed
         if left_on and right_on:
@@ -77,7 +77,7 @@ class LineSensor:
         else:
             opposite(LEFT)
             opposite(RIGHT)
-            sleep(0.5)
+            sleep(0.8)
             stop_function()
             return
 
