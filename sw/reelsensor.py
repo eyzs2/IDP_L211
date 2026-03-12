@@ -1,14 +1,14 @@
 from machine import Pin, I2C
-from utime import sleep
+from utime import sleep, ticks_diff, ticks_ms
 from VL53L0X import VL53L0X
-from pushbutton_logic import stop_function
+from pushbutton_logic import stop_function, StopRequested
 
 
-from line_logic import LEFT, RIGHT, NO_TURN, T, FORWARD, REVERSE
+from line_logic import LEFT, RIGHT, NO_TURN, T, FORWARD, REVERSE, REEL_BAY
 
 from grabber import TOP_RACK, BOTTOM_RACK, Grabber
 
-THRESHOLD_DIST = 300  # Distance threshold in mm - adjust based on testing
+THRESHOLD_DIST = 280  # Distance threshold in mm - adjust based on testing
 
 
 class ReelSensor:
@@ -103,26 +103,42 @@ class ReelSensor:
 
         grabber.grabber_align(BOTTOM_RACK)
         # move forward while still on line
-        while line.leftOn.value() and line.rightOn.value():
-            stop_function()
+        
+        start_time = ticks_ms()
+
+        while ticks_diff(ticks_ms(), start_time) < 200:
             line.lineFollow()
+
         for motor in line.motors:
             motor.off()
 
-        # TODO grabber logic
-        # print("Pretending to grab...")
-        # sleep(0.5)
-        reel = grabber.pickup()
+        reel_bay = grabber.pickup()
 
-
+        print('pickup complete')
         for i in range(len(line.motors)):
-            line.motors[i].Reverse(side=i, speed=20)
+            line.motors[i].Reverse(side=i, speed=50)
+
+        print('reversing')
 
         while not (line.leftTurn.value() or line.rightTurn.value()):
-            line.lineFollow(REVERSE)
+            stop_function()
+            continue
+        
+        while (line.leftTurn.value() or line.rightTurn.value()):
+            stop_function()
+            continue
+
+        print('back to main line')
+
+        grabber.grabber_align()
+        line.turnLogic(turnDirection=REEL_BAY)
+        print('turn complete')
 
         for motor in line.motors:
             motor.off()
+        raise StopRequested
+
+        return reel_bay #TODO
                     
 
             

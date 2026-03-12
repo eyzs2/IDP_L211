@@ -1,18 +1,23 @@
 from utime import sleep, ticks_diff, ticks_ms
 from line_logic import LineSensor, LEFT, RIGHT, NO_TURN, T, FORWARD, REVERSE
-from motor import Motor
-from start_box import exit_start_box
-from reelsensor import ReelSensor
+# from motor import Motor
+# from start_box import exit_start_box
+# from reelsensor import ReelSensor
 from pushbutton_logic import stop_function
+from grabber import Grabber
+
+DEBOUNCE_S = 0.05
+CLEAR_CONFIRM_MS = 150
 
 def _stop_motors(motors):
     motors[LEFT].off()
     motors[RIGHT].off()
     
-def run_turning_tracker(motors, line: LineSensor, reel):
-    rightTurns = {3, 12, 19}
-    leftTurns = {2}
-    reelCheckRights = {5, 6, 7, 8, 9, 10}
+def run_turning_tracker(motors, line: LineSensor, reel, grabber: Grabber):
+    rightTurns = {2, 9, 10, 11}
+    leftTurns = {1}
+
+    reelCheckRights = {3, 4, 5, 6, 7, 8}
 
     # counts
     right_any_count = 0   # RIGHT sensor high (includes T)
@@ -28,8 +33,6 @@ def run_turning_tracker(motors, line: LineSensor, reel):
     clear_L_start = None
     clear_T_start = None
 
-    DEBOUNCE_S = 0.05
-    CLEAR_CONFIRM_MS = 150
 
     # helpers
     def rear_L():
@@ -40,7 +43,7 @@ def run_turning_tracker(motors, line: LineSensor, reel):
 
     # main loop
     while True:
-        side = 0
+        stop_function()
         line.lineFollow(FORWARD)
 
         L = rear_L()
@@ -52,7 +55,7 @@ def run_turning_tracker(motors, line: LineSensor, reel):
 
         # T event first (priority)
         if (not lockout_T) and L and R:
-            sleep(DEBOUNCE_S)
+            # sleep(DEBOUNCE_S)
             if rear_L() and rear_R():
                 t_count += 1
                 right_any_count += 1
@@ -65,7 +68,7 @@ def run_turning_tracker(motors, line: LineSensor, reel):
 
         # Right-only event
         elif (not lockout_R) and R:
-            sleep(DEBOUNCE_S)
+            # sleep(DEBOUNCE_S)
             if rear_R():
                 right_any_count += 1
                 lockout_R = True
@@ -76,7 +79,7 @@ def run_turning_tracker(motors, line: LineSensor, reel):
 
         # Left-only event
         elif (not lockout_L) and L:
-            sleep(DEBOUNCE_S)
+            # sleep(DEBOUNCE_S)
             if rear_L():
                 left_any_count += 1
                 lockout_L = True
@@ -121,16 +124,16 @@ def run_turning_tracker(motors, line: LineSensor, reel):
 
         # Print + scheduled turns ONLY when a new event fired 
         if event_fired:
-    
             if right_any_count in reelCheckRights:
-                print("REEL CHECK at right count", right_any_count)
+                print("REEL CHECK at right count: ", right_any_count)
                 _stop_motors(motors)
                 sleep(0.2) # might need to adjust
 
                 if reel.check_reel_detected(RIGHT):
                     print("REEL DETECTED - starting grab")
                     reelCheckRights.remove(right_any_count)
-                    reel.grab(line, RIGHT)
+                    reel.grab(line, grabber, RIGHT)
+                    
                     sleep(0.1) # might need to adjust
                     continue
                 else:

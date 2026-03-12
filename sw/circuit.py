@@ -100,7 +100,33 @@ def main_loop(side, line: LineSensor, reel: ReelSensor, grabber):
             print("reel mode activcated")
         line.turnLogic(side)
 
+
+
+
+
+
 if __name__ == "__main__":
+    rightTurns = {3, 12, 19}
+    leftTurns = {2}
+    reelCheckRights = {5, 6, 7, 8, 9, 10}
+
+    # counts
+    right_any_count = 0   # RIGHT sensor high (includes T)
+    left_any_count = 0    # LEFT sensor high (includes T)
+    t_count = 0           # both high
+
+    # lockouts so we don't double-count
+    lockout_R = False
+    lockout_L = False
+    lockout_T = False
+
+    clear_R_start = None
+    clear_L_start = None
+    clear_T_start = None
+
+    DEBOUNCE_S = 0.05
+    CLEAR_CONFIRM_MS = 150
+
     main_loop(RIGHT, line, reel, grabber)
 
 

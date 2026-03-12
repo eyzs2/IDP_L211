@@ -46,13 +46,13 @@ def lineLogicTest():
 
     start_time = ticks_ms()
     now = ticks_ms()
-    line.motors[LEFT].Forward(side=LEFT, speed=60)
-    line.motors[RIGHT].Forward(side=RIGHT, speed=60)
+    line.motors[LEFT].Reverse(side=LEFT, speed=30)
+    line.motors[RIGHT].Reverse(side=RIGHT, speed=30)
 
     while now - start_time < 15000:
         now = ticks_ms()
-        line.turnLogic(turnDirection=RIGHT)
-        line.lineFollow()
+        line.turnLogic(turnDirection=LEFT)
+        line.lineFollow(REVERSE)
 
     line.motors[LEFT].off()
     line.motors[RIGHT].off()

@@ -18,6 +18,7 @@ from turning_tracker import run_turning_tracker
 # Mode A = Turn LEFT at first T junction
 # Mode B = Turn RIGHT at first T junction
 from reelsensor import ReelSensor
+from grabber import Grabber
 
 MODE = "A"
 loop_mode = RIGHT if MODE == "A" else LEFT
@@ -50,6 +51,10 @@ LEFT_REEL_SCL_PIN = 9
 RIGHT_REEL_SDA_PIN = 10
 RIGHT_REEL_SCL_PIN = 11
 
+
+GRABBER_RESISTANCE_SENSOR_PIN = 28
+GRABBER_GRAB_SERVO_PIN = 15
+GRABBER_TILT_SERVO_PIN = 13
 
 
 # memory variables to store state about the mission:
@@ -90,6 +95,12 @@ reel = ReelSensor(
     rightReelSDA=RIGHT_REEL_SDA_PIN,
     rightReelSCL=RIGHT_REEL_SCL_PIN
 )
+
+grabber = Grabber(
+    resistance_pin=GRABBER_RESISTANCE_SENSOR_PIN, 
+    grab_pin=GRABBER_GRAB_SERVO_PIN, 
+    tilt_pin=GRABBER_TILT_SERVO_PIN
+    )
 
 
 # helper functions
@@ -136,8 +147,10 @@ while True:
 
     try:
         # 3) EXIT START BOX
-        exit_start_box(line, motors)
-        run_turning_tracker(motors, line, reel)
+        got_out = exit_start_box(line, motors)
+        if got_out:
+            print('free from start box')
+        run_turning_tracker(motors, line, reel, grabber)
     except StopRequested:
         print("Stop requested — stopping motors and restarting.")
         stop_motors()

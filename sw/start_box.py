@@ -4,16 +4,17 @@ from line_logic import LineSensor, FORWARD, REVERSE
 LEFT = 0
 RIGHT = 1
 
-def exit_start_box(line:LineSensor, motors, motorspeed=35, confirm_ms=120, timeout_ms=4000):
+def exit_start_box(line:LineSensor, motors, motorspeed=40, confirm_ms=120, timeout_ms=4000):
 
     start_time = ticks_ms()
     confirm_start = None
 
+    print('starting')
     while ticks_diff(ticks_ms(), start_time) < timeout_ms:
 
         # drive straight forward 
-        motors[LEFT].Forward(LEFT, speed=motorspeed)
-        motors[RIGHT].Forward(RIGHT, speed=motorspeed)
+        line.motors[LEFT].Forward(LEFT, speed=motorspeed)
+        line.motors[RIGHT].Forward(RIGHT, speed=motorspeed)
 
         # read front sensors 
         left_turn_on_line = line.leftTurn.value()
@@ -49,5 +50,22 @@ def exit_start_box(line:LineSensor, motors, motorspeed=35, confirm_ms=120, timeo
     motors[RIGHT].off()
     print("Timeout: Failed to detect line within time limit.")
     return False
+
+# def reel_drop(reel_rack, reel_bay, line: LineSensor, grabber: Grabber):
+    # while True:
+        # stop_function()
+        # line.LineFollow()
+        # if line.turnSense[LEFT].value() and line.turnSense[RIGHT].value():
+            # for motor in line.motors:
+                # motor.off()
+            # grabber.grabServo.angle(200)
+            # while line.turnSense[LEFT].value() or line.turnSense[RIGHT].value():
+            #   stop_function()
+            #   line.LineFollow(REVERSE)
+            # while not line.turnSense[LEFT]:
+            #   stop_function()
+            #   line.LineFollow(REVERSE)
+            # line.turnLogic(LEFT)
+        #      
 
 
