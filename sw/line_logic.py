@@ -9,8 +9,6 @@ RIGHT = 1
 NO_TURN = 2
 T = 3
 
-REEL_BAY = 10
-
 FORWARD = 0
 REVERSE = 1
 
@@ -139,19 +137,6 @@ class LineSensor:
                 sleep(0.5)
 
                 print("turn complete")
-            elif turnDirection == REEL_BAY:
-                motors[turnDirection].Reverse(side=RIGHT, speed=70)  # change turn speed here as needed
-                motors[(turnDirection+1) % 2].Forward(side=(RIGHT+1) % 2, speed=70)
-
-                # settle time: don't check sensors yet
-                while (self.lineSense[LEFT].value() or self.lineSense[RIGHT].value()):
-                    stop_function()
-                    sleep(0.1) 
-                # wait until BOTH front sensors are back on the line
-                print('cleared lines')
-                while not (self.lineSense[LEFT].value() and self.lineSense[RIGHT].value()):
-                    stop_function()
-                    sleep(0.1)
 
             else:
                 print("non-loop turn detected!")
