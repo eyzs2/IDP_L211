@@ -1,3 +1,5 @@
+from pyparsing import line
+
 from machine import Pin, I2C
 from utime import sleep, ticks_diff, ticks_ms
 from VL53L0X import VL53L0X
@@ -114,21 +116,25 @@ class ReelSensor:
 
         reel_bay = grabber.pickup()
 
-        print('pickup complete')
-        for i in range(len(line.motors)):
-            line.motors[i].Reverse(side=i, speed=50)
+        print("pickup complete")
 
-        print('reversing')
+        # 180 degree pivot turn: one motor reverse, the other forward
+        line.motors[LEFT].Reverse(speed=50)
+        line.motors[RIGHT].Forward(speed=50)
 
-        while not (line.leftTurn.value() or line.rightTurn.value()):
+        print("180 degree turn")
+
+        # keep turning until both front sensors are back on the line
+        while not (line.leftOn.value() and line.rightOn.value()):
             stop_function()
             continue
-        
-        while (line.leftTurn.value() or line.rightTurn.value()):
-            stop_function()
-            continue
 
-        print('back to main line')
+        # stop briefly once line is found
+        line.motors[LEFT].off()
+        line.motors[RIGHT].off()
+        sleep(0.5) # might need to adjust
+
+        print("back on main line")
 
         grabber.grabber_align()
         line.turnLogic(turnDirection=REEL_BAY)
