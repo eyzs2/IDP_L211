@@ -142,9 +142,11 @@ def run_turning_tracker(
                 if reel.check_reel_detected(RIGHT):
                     print("REEL DETECTED - starting grab")
                     reelCheckRights.remove(right_any_count)
-                    reel.grab(line, grabber, RIGHT)
+                    reel_bay = reel.grab(line, grabber, RIGHT)
                     
                     sleep(0.1) # might need to adjust
+                    run_dropoff_tracker(motors, line)
+                    
                     break
                 else:
                     print("No reel found")
@@ -163,3 +165,56 @@ def run_turning_tracker(
                 _stop_motors(motors)
                 line.turnLogic(turnDirection=LEFT)
                 sleep(0.1) # give time to clear turn before next event
+
+
+def run_dropoff_tracker(motors, line: LineSensor):
+    t_count = 0
+    lockout_T = False
+    clear_T_start = None
+
+    def rear_L():
+        return line.turnSense[LEFT].value() == 1
+
+    def rear_R():
+        return line.turnSense[RIGHT].value() == 1
+
+    while True:
+        stop_function()
+        line.lineFollow(FORWARD)
+
+        L = rear_L()
+        R = rear_R()
+
+        event_fired = False
+
+        if (not lockout_T) and L and R:
+            if rear_L() and rear_R():
+                t_count += 1
+                lockout_T = True
+                clear_T_start = None
+                event_fired = True
+                print("T detected:", t_count)
+
+        if lockout_T:
+            if not (rear_L() and rear_R()):
+                if clear_T_start is None:
+                    clear_T_start = ticks_ms()
+                elif ticks_diff(ticks_ms(), clear_T_start) > CLEAR_CONFIRM_MS:
+                    lockout_T = False
+                    clear_T_start = None
+            else:
+                clear_T_start = None
+
+        if event_fired:
+            if t_count == 1:
+                print("first T reached - turning left")
+                _stop_motors(motors)
+                line.turnLogic(turnDirection=LEFT)
+                sleep(0.1)
+
+            elif t_count == 2:
+                _stop_motors(motors)
+                print("drop off occurring")
+                break
+
+

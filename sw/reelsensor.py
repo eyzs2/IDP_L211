@@ -127,21 +127,17 @@ class ReelSensor:
         # keep turning until both front sensors are back on the line
         while not (line.leftOn.value() and line.rightOn.value()):
             stop_function()
-            continue
+            sleep(0.1)
 
         # stop briefly once line is found
         line.motors[LEFT].off()
         line.motors[RIGHT].off()
-        sleep(0.5) # might need to adjust
+        sleep(0.2) # might need to adjust
 
         print("back on main line")
 
         grabber.grabber_align()
-        print('turn complete')
-
-        for motor in line.motors:
-            motor.off()
-        raise StopRequested
+        print('ready for return route')
 
         return reel_bay #TODO
                     
