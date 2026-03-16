@@ -6,7 +6,7 @@ from VL53L0X import VL53L0X
 from pushbutton_logic import stop_function, StopRequested
 
 
-from line_logic import LEFT, RIGHT, NO_TURN, T, FORWARD, REVERSE, REEL_BAY
+from line_logic import LEFT, RIGHT, NO_TURN, T, FORWARD, REVERSE
 
 from grabber import TOP_RACK, BOTTOM_RACK, Grabber
 
@@ -137,7 +137,6 @@ class ReelSensor:
         print("back on main line")
 
         grabber.grabber_align()
-        line.turnLogic(turnDirection=REEL_BAY)
         print('turn complete')
 
         for motor in line.motors:
