@@ -1,5 +1,3 @@
-from pyparsing import line
-
 from machine import Pin, I2C
 from utime import sleep, ticks_diff, ticks_ms
 from VL53L0X import VL53L0X

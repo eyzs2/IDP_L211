@@ -24,6 +24,8 @@ from grabber import Grabber
 A = 1
 B = 0 # Loop modes
 
+modes = [A, B]
+
 LEFT_MOTOR = 0
 RIGHT_MOTOR = 1
 
@@ -147,21 +149,22 @@ while True:
     reset_memory()
     stop_motors()
     reel_Return = False
+    for side in modes:
 
-    try:
-        # 3) EXIT START BOX
-        got_out = exit_start_box(line, motors)
-        if got_out:
-            print('free from start box')
-        while reel_Return == False:
-            reel_Return = run_turning_tracker(motors=motors, line=line, side=A, reel=reel, grabber=grabber)
-    except StopRequested:
-        print("Stop requested — stopping motors and restarting.")
-        stop_motors()
-        clear_stop()
-        # small delay to debounce / give scheduled exceptions time to clear
-        sleep(0.3)
-        continue
+        try:
+            # 3) EXIT START BOX
+            got_out = exit_start_box(line, motors)
+            if got_out:
+                print('free from start box')
+            while reel_Return == False:
+                reel_Return = run_turning_tracker(motors=motors, line=line, side=side, reel=reel, grabber=grabber)
+        except StopRequested:
+            print("Stop requested — stopping motors and restarting.")
+            stop_motors()
+            clear_stop()
+            # small delay to debounce / give scheduled exceptions time to clear
+            sleep(0.3)
+            continue
     
 
 

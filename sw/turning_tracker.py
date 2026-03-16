@@ -20,10 +20,10 @@ def run_turning_tracker(
         reel, 
         grabber: Grabber, 
         inputRightTurns = {}, inputLeftTurns = {}, inputReelCheckRights = {}, inputReelCheckLefts = {}):
-    rightTurns = inputRightTurns # {2, 9, 10, 11}
-    leftTurns = inputLeftTurns # {1}
-    reelCheckLefts = inputReelCheckLefts
-    reelCheckRights = inputReelCheckRights # {3, 4, 5, 6, 7, 8}
+    rightTurns = inputRightTurns # {9, 10, 11,12}
+    leftTurns = inputLeftTurns # {}
+    reelCheckLefts = inputReelCheckLefts # {3, 4, 5, 6, 7, 8}
+    reelCheckRights = inputReelCheckRights # {2, 3, 4, 5, 6, 7}
     reelCheckSets = [reelCheckLefts, reelCheckRights]
     
 
@@ -134,6 +134,22 @@ def run_turning_tracker(
 
         # Print + scheduled turns ONLY when a new event fired 
         if event_fired:
+            if left_any_count in reelCheckLefts:
+                print("REEL CHECK at left count: ", left_any_count)
+                _stop_motors(motors)
+                sleep(0.2) # might need to adjust
+
+                if reel.check_reel_detected(RIGHT):
+                    print("REEL DETECTED - starting grab")
+                    # reelCheckRights.remove(right_any_count)
+                    reel.grab(line, grabber, RIGHT)
+                    
+                    sleep(0.1) # might need to adjust
+                    break
+                else:
+                    print("No reel found")
+                    # reelCheckRights.remove(right_any_count)
+                    sleep(0.01)
             if right_any_count in reelCheckRights:
                 print("REEL CHECK at right count: ", right_any_count)
                 _stop_motors(motors)
@@ -141,15 +157,15 @@ def run_turning_tracker(
 
                 if reel.check_reel_detected(RIGHT):
                     print("REEL DETECTED - starting grab")
-                    reelCheckRights.remove(right_any_count)
+                    # reelCheckRights.remove(right_any_count)
                     reel.grab(line, grabber, RIGHT)
                     
                     sleep(0.1) # might need to adjust
                     break
                 else:
                     print("No reel found")
-                    reelCheckRights.remove(right_any_count)
-                    sleep(0.5) # might need to adjust
+                    # reelCheckRights.remove(right_any_count)
+                    sleep(0.01) # might need to adjust
 
             # only turn on scheduled numbers
             if right_any_count in rightTurns:
