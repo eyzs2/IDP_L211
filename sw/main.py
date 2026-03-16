@@ -20,8 +20,10 @@ from turning_tracker import run_turning_tracker
 from reelsensor import ReelSensor
 from grabber import Grabber
 
-MODE = "A"
-loop_mode = RIGHT if MODE == "A" else LEFT
+
+A = 1
+B = 0 # Loop modes
+
 LEFT_MOTOR = 0
 RIGHT_MOTOR = 1
 
@@ -59,8 +61,8 @@ GRABBER_TILT_SERVO_PIN = 13
 
 # memory variables to store state about the mission:
 
-racks_visited = []
-current_rack = None
+# racks_visited = []
+# current_rack = None
 
 # Flag to signal immediate stop during line follow
 STOP_REQUESTED = False
@@ -144,13 +146,15 @@ while True:
     # 2) RESET MEMORY AND STOP MOTORS
     reset_memory()
     stop_motors()
+    reel_Return = False
 
     try:
         # 3) EXIT START BOX
         got_out = exit_start_box(line, motors)
         if got_out:
             print('free from start box')
-        run_turning_tracker(motors, line, reel, grabber)
+        while reel_Return == False:
+            reel_Return = run_turning_tracker(motors=motors, line=line, side=A, reel=reel, grabber=grabber)
     except StopRequested:
         print("Stop requested — stopping motors and restarting.")
         stop_motors()

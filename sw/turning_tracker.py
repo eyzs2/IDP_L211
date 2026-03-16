@@ -13,11 +13,21 @@ def _stop_motors(motors):
     motors[LEFT].off()
     motors[RIGHT].off()
     
-def run_turning_tracker(motors, line: LineSensor, reel, grabber: Grabber):
-    rightTurns = {2, 9, 10, 11}
-    leftTurns = {1}
+def run_turning_tracker(
+        motors, 
+        line: LineSensor, 
+        side,
+        reel, 
+        grabber: Grabber, 
+        inputRightTurns = {}, inputLeftTurns = {}, inputReelCheckRights = {}, inputReelCheckLefts = {}):
+    rightTurns = inputRightTurns # {2, 9, 10, 11}
+    leftTurns = inputLeftTurns # {1}
+    reelCheckLefts = inputReelCheckLefts
+    reelCheckRights = inputReelCheckRights # {3, 4, 5, 6, 7, 8}
+    reelCheckSets = [reelCheckLefts, reelCheckRights]
+    
 
-    reelCheckRights = {3, 4, 5, 6, 7, 8}
+    first_reel = reelCheckSets[side].min()
 
     # counts
     right_any_count = 0   # RIGHT sensor high (includes T)
@@ -135,7 +145,7 @@ def run_turning_tracker(motors, line: LineSensor, reel, grabber: Grabber):
                     reel.grab(line, grabber, RIGHT)
                     
                     sleep(0.1) # might need to adjust
-                    continue
+                    break
                 else:
                     print("No reel found")
                     reelCheckRights.remove(right_any_count)
