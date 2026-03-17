@@ -148,7 +148,7 @@ class LineSensor:
                 print("180 degree turn")
                 while (self.leftOn.value() or self.rightOn.value()):
                     stop_function()
-                    sleep(0.1)ß
+                    sleep(0.1)
 
                 # keep turning until both front sensors are back on the line
                 while not (self.leftOn.value() and self.rightOn.value()):
