@@ -162,7 +162,9 @@ def run_turning_tracker(
                     
                     sleep(0.1) # might need to adjust
                     run_dropoff_tracker(motors, line)
-                    
+                    run_return_to_start(motors, line)
+
+
                     break
                 else:
                     print("No reel found")
@@ -234,3 +236,81 @@ def run_dropoff_tracker(motors, line: LineSensor):
                 break
 
 
+
+def run_return_to_start(motors, line: LineSensor):
+    left_any_count = 0
+    lockout_L = False
+    clear_L_start = None
+
+    def rear_L():
+        return line.turnSense[LEFT].value() == 1
+
+    while True:
+        stop_function()
+        line.lineFollow(FORWARD)
+
+        event_fired = False
+
+        # detect left event once
+        if (not lockout_L) and rear_L():
+            if rear_L():
+                left_any_count += 1
+                lockout_L = True
+                clear_L_start = None
+                event_fired = True
+                print("Return left detected:", left_any_count)
+
+        # unlock left after it has been clear for long enough
+        if lockout_L:
+            if not rear_L():
+                if clear_L_start is None:
+                    clear_L_start = ticks_ms()
+                elif ticks_diff(ticks_ms(), clear_L_start) > CLEAR_CONFIRM_MS:
+                    lockout_L = False
+                    clear_L_start = None
+            else:
+                clear_L_start = None
+
+        if event_fired:
+            # first left: take it
+            if left_any_count == 1:
+                print("Return route: taking first left")
+                _stop_motors(motors)
+                line.turnLogic(turnDirection=LEFT)
+                sleep(0.1)
+
+            # second left: ignore it
+            elif left_any_count == 2:
+                print("Return route: ignoring second left")
+
+            # third left: take it, then forward 1 second, then dance
+            elif left_any_count == 3:
+                print("Return route: taking third left")
+                _stop_motors(motors)
+                line.turnLogic(turnDirection=LEFT)
+                sleep(0.1)
+
+                print("driving forward into finish area")
+                start_time = ticks_ms()
+                while ticks_diff(ticks_ms(), start_time) < 1000:
+                    stop_function()
+                    line.lineFollow(FORWARD)
+
+                _stop_motors(motors)
+                sleep(0.2)
+
+                do_dance(motors)
+                break
+
+
+def do_dance(motors):
+    print("starting dance")
+
+    start_time = ticks_ms()
+    while ticks_diff(ticks_ms(), start_time) < 5000:
+        stop_function()
+        motors[LEFT].Reverse(side=LEFT, speed=90)
+        motors[RIGHT].Forward(side=RIGHT, speed=90)
+
+    _stop_motors(motors)
+    print("dance complete")

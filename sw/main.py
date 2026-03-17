@@ -152,12 +152,14 @@ while True:
     for side in modes:
 
         try:
-            # 3) EXIT START BOX
+            # EXIT START BOX
             got_out = exit_start_box(line, motors)
             if got_out:
                 print('free from start box')
             while reel_Return == False:
                 reel_Return = run_turning_tracker(motors=motors, line=line, side=side, reel=reel, grabber=grabber)
+
+                
         except StopRequested:
             print("Stop requested — stopping motors and restarting.")
             stop_motors()
