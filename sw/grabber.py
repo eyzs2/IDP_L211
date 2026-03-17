@@ -22,9 +22,9 @@ BOTTOM_RACK = 0
 TOP_RACK = 1
 TRANSPORT = 2
 
-bot_angle = 150 # (+35 deg from neutral)
-top_angle = 120 # (-35 deg from neutral)
-travel_angle = 135
+bot_angle = 100 # (+35 deg from neutral)
+top_angle = 90 # (-35 deg from neutral)
+travel_angle = 90
 
 
 class Servo:
@@ -95,8 +95,8 @@ class Grabber:
             self.grabTilt.angle(travel_angle)
 
     def pickup(self):
-        grab_angle = 200 
-        while grab_angle > 165:
+        grab_angle = 185 
+        while grab_angle > 160:
             stop_function()
             self.grabServo.angle(grab_angle)
             grab_angle -= 5
@@ -105,10 +105,9 @@ class Grabber:
             sleep(0.5)
         # reel_id = self.reel_identifier()
         # return reel_id
-        return None # TODO
     
     def dropoff(self):
-        self.grabServo.angle(200)
+        self.grabServo.angle(185)
 
 
 
@@ -133,7 +132,7 @@ def test_grabber():
     # # grabber.grabServo.angle(180)
     # grabber.grabTilt.angle(180)
     sleep(1)
-    grabber.grabServo.angle(165)
+    grabber.grabServo.angle(160)
     sleep(1)
 
     nice = grabber.reel_identifier()

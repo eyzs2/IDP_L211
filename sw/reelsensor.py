@@ -50,7 +50,7 @@ class ReelSensor:
             distance = sensor.read()
             print(f"Distance = {distance}mm")  # Check calibration!
             distSamples.append(distance)
-            sleep(0.1)
+            sleep(0.01)
         
         # Stop device
         sensor.stop()
@@ -82,19 +82,6 @@ class ReelSensor:
 
     def grab(self, line, grabber:Grabber, side):
 
-        """
-        Temporary placeholder grab routine.
-
-        Current behaviour:
-        1. Turn toward requested side
-        2. Move forward until front line is lost
-        3. Stop for pickup
-        4. Reverse until front line is found again
-        5. Stop
-
-        Replace the section later with actual grabber actuation.
-        """
-
         print("Starting grab routine on side", side)
 
         # turn toward the reel side
@@ -106,38 +93,23 @@ class ReelSensor:
         
         start_time = ticks_ms()
 
-        while ticks_diff(ticks_ms(), start_time) < 200:
+        while ticks_diff(ticks_ms(), start_time) < 600:
             line.lineFollow()
 
         for motor in line.motors:
             motor.off()
 
-        reel_bay = grabber.pickup()
+        grabber.pickup()
 
         print("pickup complete")
 
         # 180 degree pivot turn: one motor reverse, the other forward
-        line.motors[LEFT].Reverse(speed=50)
-        line.motors[RIGHT].Forward(speed=50)
-
-        print("180 degree turn")
-
-        # keep turning until both front sensors are back on the line
-        while not (line.leftOn.value() and line.rightOn.value()):
-            stop_function()
-            sleep(0.1)
-
-        # stop briefly once line is found
-        line.motors[LEFT].off()
-        line.motors[RIGHT].off()
-        sleep(0.2) # might need to adjust
+        
 
         print("back on main line")
 
         grabber.grabber_align()
         print('ready for return route')
-
-        return reel_bay #TODO
                     
 
             

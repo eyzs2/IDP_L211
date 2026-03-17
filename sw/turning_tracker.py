@@ -16,18 +16,14 @@ def _stop_motors(motors):
 def run_turning_tracker(
         motors, 
         line: LineSensor, 
-        side,
         reel, 
         grabber: Grabber, 
         inputRightTurns = {}, inputLeftTurns = {}, inputReelCheckRights = {}, inputReelCheckLefts = {}):
-    rightTurns = inputRightTurns # {9, 10, 11,12}
-    leftTurns = inputLeftTurns # {}
-    reelCheckLefts = inputReelCheckLefts # {3, 4, 5, 6, 7, 8}
-    reelCheckRights = inputReelCheckRights # {2, 3, 4, 5, 6, 7}
-    reelCheckSets = [reelCheckLefts, reelCheckRights]
+    rightTurns = inputRightTurns # {2}
+    leftTurns = inputLeftTurns # {1}
+    reelCheckLefts = inputReelCheckLefts # {}
+    reelCheckRights = inputReelCheckRights # {3, 4, 5, 6, 7, 8}
     
-
-    first_reel = reelCheckSets[side].min()
 
     # counts
     right_any_count = 0   # RIGHT sensor high (includes T)
@@ -139,12 +135,14 @@ def run_turning_tracker(
                 _stop_motors(motors)
                 sleep(0.2) # might need to adjust
 
-                if reel.check_reel_detected(RIGHT):
+                if reel.check_reel_detected(LEFT):
                     print("REEL DETECTED - starting grab")
                     # reelCheckRights.remove(right_any_count)
-                    reel.grab(line, grabber, RIGHT)
+                    reel.grab(line, grabber, LEFT)
                     
                     sleep(0.1) # might need to adjust
+
+                    # run_dropoff_tracker(motors, line, grabber, LEFT)
                     break
                 else:
                     print("No reel found")
@@ -161,9 +159,9 @@ def run_turning_tracker(
                     reel.grab(line, grabber, RIGHT)
                     
                     sleep(0.1) # might need to adjust
-                    run_dropoff_tracker(motors, line)
+                    run_dropoff_tracker(motors, line, grabber, RIGHT)
                     
-                    break
+                    # break
                 else:
                     print("No reel found")
                     # reelCheckRights.remove(right_any_count)
@@ -183,7 +181,7 @@ def run_turning_tracker(
                 sleep(0.1) # give time to clear turn before next event
 
 
-def run_dropoff_tracker(motors, line: LineSensor):
+def run_dropoff_tracker(motors, line: LineSensor, grabber: Grabber, side):
     t_count = 0
     lockout_T = False
     clear_T_start = None
@@ -193,9 +191,8 @@ def run_dropoff_tracker(motors, line: LineSensor):
 
     def rear_R():
         return line.turnSense[RIGHT].value() == 1
-
     while True:
-        stop_function()
+        stop_function() 
         line.lineFollow(FORWARD)
 
         L = rear_L()
@@ -225,12 +222,13 @@ def run_dropoff_tracker(motors, line: LineSensor):
             if t_count == 1:
                 print("first T reached - turning left")
                 _stop_motors(motors)
-                line.turnLogic(turnDirection=LEFT)
+                line.turnLogic(turnDirection=((side+1)%2))
                 sleep(0.1)
 
             elif t_count == 2:
                 _stop_motors(motors)
                 print("drop off occurring")
+                grabber.dropoff()
                 break
 
 
