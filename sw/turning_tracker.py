@@ -27,7 +27,7 @@ def run_turning_tracker(
     reelCheckSets = [reelCheckLefts, reelCheckRights]
     
 
-    first_reel = reelCheckSets[side].min()
+    first_reel = min(reelCheckSets[side])
 
     # counts
     right_any_count = 0   # RIGHT sensor high (includes T)
