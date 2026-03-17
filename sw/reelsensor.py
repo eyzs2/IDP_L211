@@ -4,7 +4,7 @@ from VL53L0X import VL53L0X
 from pushbutton_logic import stop_function, StopRequested
 
 
-from line_logic import LEFT, RIGHT, NO_TURN, T, FORWARD, REVERSE
+from line_logic import LEFT, RIGHT, NO_TURN, T, FORWARD, REVERSE, FLIP
 
 from grabber import TOP_RACK, BOTTOM_RACK, Grabber
 
@@ -103,10 +103,21 @@ class ReelSensor:
 
         print("pickup complete")
 
-        # 180 degree pivot turn: one motor reverse, the other forward
-        
+        start_time = ticks_ms()
+        while ticks_diff(ticks_ms(), start_time) < 500:
+            stop_function()
+            line.lineFollow(direction=REVERSE)
 
-        print("back on main line")
+        line.motors[LEFT].off()
+        line.motors[RIGHT].off()
+        sleep(0.2) # might need to adjust
+
+        line.turnLogic(turnDirection=FLIP) # turn back toward main line
+        line.motors[LEFT].off()
+        line.motors[RIGHT].off()    
+        sleep(0.2) # might need to adjust
+
+        print("turned back toward main line")
 
         grabber.grabber_align()
         print('ready for return route')
