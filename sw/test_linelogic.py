@@ -49,7 +49,7 @@ def lineLogicTest():
 
     while now - start_time < 15000:
         now = ticks_ms()
-        line.turnLogic(turnDirection=LEFT)
+        line.turnLogic(turnDirection=4)
         line.lineFollow()
 
     line.motors[LEFT].off()

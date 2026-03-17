@@ -8,6 +8,7 @@ LEFT = 0
 RIGHT = 1
 NO_TURN = 2
 T = 3
+FLIP = 4
 
 FORWARD = 0
 REVERSE = 1
@@ -118,7 +119,7 @@ class LineSensor:
                 # execute turn based on predetermined outcome (loop)
                 print("turning, ", "type: ", turnDirection)
 
-                motors[turnDirection].Reverse(side=turnDirection, speed=30)  # change turn speed here as needed
+                motors[turnDirection].Reverse(side=turnDirection, speed=40)  # change turn speed here as needed
                 motors[(turnDirection+1) % 2].Forward(side=(turnDirection+1) % 2, speed=70)
 
                 # settle time: don't check sensors yet
@@ -135,8 +136,29 @@ class LineSensor:
                 motors[LEFT].off()
                 motors[RIGHT].off()
                 sleep(0.5)
-
                 print("turn complete")
+
+            elif turnDirection == FLIP:
+                motors[LEFT].off()
+                motors[RIGHT].off()
+                
+                motors[LEFT].Reverse(side=LEFT, speed=70)
+                motors[RIGHT].Forward(side=RIGHT, speed=70)
+
+                print("180 degree turn")
+                while (self.leftOn.value() or self.rightOn.value()):
+                    stop_function()
+                    sleep(0.1)ß
+
+                # keep turning until both front sensors are back on the line
+                while not (self.leftOn.value() and self.rightOn.value()):
+                    stop_function()
+                    sleep(0.1)
+
+                # stop briefly once line is found
+                motors[LEFT].off()
+                motors[RIGHT].off()
+                sleep(0.2) # might need to adjust
 
             else:
                 print("non-loop turn detected!")
