@@ -10,7 +10,7 @@ RIGHT = 1
 
 def checktest():
     sensors = ReelSensor(8,9,10,11)
-    something = sensors.check_reel_detected(RIGHT)
+    something = sensors.check_reel_detected(0)
 
 
 

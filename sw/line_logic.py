@@ -107,38 +107,7 @@ class LineSensor:
                     turnDetection = i # else treat as corner
                     break 
 
-        if turnDetection != NO_TURN:
-            print("turn detected", "turn type: ", turnDetection)
-            stop_function()
-
-            if turnDetection == T or turnDetection == turnDirection:
-                motors[LEFT].off()
-                motors[RIGHT].off()
-                sleep(0.5)  # brief pause to let robot stop before turning
-
-                # execute turn based on predetermined outcome (loop)
-                print("turning, ", "type: ", turnDirection)
-
-                motors[turnDirection].Reverse(side=turnDirection, speed=20)  # change turn speed here as needed
-                motors[(turnDirection+1) % 2].Forward(side=(turnDirection+1) % 2, speed=70)
-
-                # settle time: don't check sensors yet
-                while (self.lineSense[LEFT].value() or self.lineSense[RIGHT].value()):
-                    stop_function()
-                    sleep(0.1) 
-                # wait until BOTH front sensors are back on the line
-                print('cleared lines')
-                while not (self.lineSense[LEFT].value() and self.lineSense[RIGHT].value()):
-                    stop_function()
-                    sleep(0.1)
-                
-
-                motors[LEFT].off()
-                motors[RIGHT].off()
-                sleep(0.5)
-                print("turn complete")
-
-            elif turnDirection == FLIP:
+        if turnDirection == FLIP:
                 motors[LEFT].off()
                 motors[RIGHT].off()
                 
@@ -161,9 +130,45 @@ class LineSensor:
                 motors[LEFT].off()
                 motors[RIGHT].off()
                 sleep(0.2) # might need to adjust
+                return
 
-            else:
-                print("non-loop turn detected!")
+        else:
+            if turnDetection != NO_TURN:
+                print("turn detected", "turn type: ", turnDetection)
+                stop_function()
+
+                if turnDetection == T or turnDetection == turnDirection:
+                    motors[LEFT].off()
+                    motors[RIGHT].off()
+                    sleep(0.5)  # brief pause to let robot stop before turning
+
+                    # execute turn based on predetermined outcome (loop)
+                    print("turning, ", "type: ", turnDirection)
+
+                    motors[turnDirection].Reverse(side=turnDirection, speed=20)  # change turn speed here as needed
+                    motors[(turnDirection+1) % 2].Forward(side=(turnDirection+1) % 2, speed=70)
+
+                    # settle time: don't check sensors yet
+                    while (self.lineSense[LEFT].value() or self.lineSense[RIGHT].value()):
+                        stop_function()
+                        sleep(0.1) 
+                    # wait until BOTH front sensors are back on the line
+                    print('cleared lines')
+                    while not (self.lineSense[LEFT].value() and self.lineSense[RIGHT].value()):
+                        stop_function()
+                        sleep(0.1)
+                    
+
+                    motors[LEFT].off()
+                    motors[RIGHT].off()
+                    sleep(0.5)
+                    print("turn complete")
+                    return
+
+
+                else:
+                    print("non-loop turn detected!")
+                    return
 
 
 # def test_line_sensors():

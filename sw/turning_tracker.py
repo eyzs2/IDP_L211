@@ -142,7 +142,7 @@ def run_turning_tracker(
                     
                     sleep(0.1) # might need to adjust
 
-                    # run_dropoff_tracker(motors, line, grabber, LEFT)
+                    run_dropoff_tracker(motors, line, grabber, LEFT)
                     break
                 else:
                     print("No reel found")
@@ -161,7 +161,7 @@ def run_turning_tracker(
                     sleep(0.1) # might need to adjust
                     run_dropoff_tracker(motors, line, grabber, RIGHT)
                     
-                    # break
+                    break
                 else:
                     print("No reel found")
                     # reelCheckRights.remove(right_any_count)

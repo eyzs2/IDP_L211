@@ -4,7 +4,7 @@ from line_logic import LineSensor, FORWARD, REVERSE
 LEFT = 0
 RIGHT = 1
 
-def exit_start_box(line:LineSensor, motors, motorspeed=40, confirm_ms=120, timeout_ms=4000):
+def exit_start_box(line:LineSensor, motors, motorspeed=40, confirm_ms=120, timeout_ms=5000):
 
     start_time = ticks_ms()
     confirm_start = None

@@ -96,7 +96,7 @@ class Grabber:
 
     def pickup(self):
         grab_angle = 185 
-        while grab_angle > 160:
+        while grab_angle >= 160:
             stop_function()
             self.grabServo.angle(grab_angle)
             grab_angle -= 5

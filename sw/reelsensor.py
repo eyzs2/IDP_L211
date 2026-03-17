@@ -104,9 +104,15 @@ class ReelSensor:
         print("pickup complete")
 
         start_time = ticks_ms()
-        while ticks_diff(ticks_ms(), start_time) < 500:
+        line.motors[LEFT].Reverse(LEFT, 60)
+        line.motors[RIGHT].Reverse(RIGHT, 60)
+        
+
+        while ticks_diff(ticks_ms(), start_time) < 700:
             stop_function()
-            line.lineFollow(direction=REVERSE)
+
+        grabber.grabber_align()
+            
 
         line.motors[LEFT].off()
         line.motors[RIGHT].off()
@@ -119,7 +125,7 @@ class ReelSensor:
 
         print("turned back toward main line")
 
-        grabber.grabber_align()
+        
         print('ready for return route')
                     
 
