@@ -7,13 +7,13 @@ from line_logic import LEFT, RIGHT, NO_TURN, T, FORWARD, REVERSE
 VOLTAGE_THRESHOLD = 30
 
 BLUE = 0
-BLUE_THRESHOLD = [3200, 3300] # insert range of voltage values
+BLUE_THRESHOLD = [3100, 3200] # insert range of voltage values
 GREEN = 1
-GREEN_THRESHOLD = [2800, 3100]
-YELLOW = 2
-YELLOW_THRESHOLD = [1600, 1800]
-RED = 3
-RED_THRESHOLD = [200,400]
+GREEN_THRESHOLD = [2700, 2800]
+RED = 2
+RED_THRESHOLD = [1800, 1950]
+YELLOW = 3
+YELLOW_THRESHOLD = [200, 400]
 
 
 LED = []
@@ -56,24 +56,34 @@ class Servo:
 class Grabber:
     def __init__(self, resistance_pin, grab_pin, tilt_pin):
         self.resistanceSensor = ADC(resistance_pin)
-        self.mvolts = int(self.resistanceSensor.read_u16() * (1/65535) * 3300)
         self.grabServo = Servo(grab_pin)
-        self.grabServo.angle(200)
+        self.grabServo.angle(185)
         self.grabTilt = Servo(tilt_pin)
-        self.grabTilt.angle(135)
+        self.grabTilt.angle(90)
 
     def reel_identifier(self): # detect reel via pot div, to discuss with electrical 
         # light up respective LED
-        mvolts = self.mvolts
+        mvoltList = []
+        for i in range(3):
+            mvolts = int(self.resistanceSensor.read_u16() * (1/65535) * 3300)
+            mvoltList.append(mvolts)
+            print(mvolts)
+            sleep(0.5)
+        mvolts = sum(mvoltList)/len(mvoltList)
+        print(mvolts)
         if BLUE_THRESHOLD[0] <= mvolts <= BLUE_THRESHOLD[1]:
+            print('blue')
             return BLUE
         elif GREEN_THRESHOLD[0] <= mvolts <= GREEN_THRESHOLD[1]:
+            print('green')
             return GREEN
         elif RED_THRESHOLD[0] <= mvolts <= RED_THRESHOLD[1]:
+            print('red')
             return RED
         elif YELLOW_THRESHOLD[0] <= mvolts <= YELLOW_THRESHOLD[1]:
+            print('yellow')
             return YELLOW
-        
+        print('nothing')
         return None
     
     def grabber_align(self,level=TRANSPORT):
@@ -96,14 +106,19 @@ class Grabber:
         # reel_id = self.reel_identifier()
         # return reel_id
         return None # TODO
+    
+    def dropoff(self):
+        self.grabServo.angle(200)
 
 
 
 def test_grabber():
-    grabber = Grabber(26, 15, 13)
+    grabber = Grabber(28, 15, 13)
     # start = ticks_ms()
     # straight ahead angle for grab servo = 180
-    grabber.grabServo.angle(200)
+    # grabber.grabServo.angle(200)
+
+    grabber.grabTilt.angle(100)
 
     # test_angles = [0, 45, 90, 135, 180]
 
@@ -121,16 +136,15 @@ def test_grabber():
     grabber.grabServo.angle(165)
     sleep(1)
 
-    grabber.grabTilt.angle(150)
-    sleep(1)
+    nice = grabber.reel_identifier()
 
-    grabber.grabTilt.angle(135)
-    sleep(1)
+    # grabber.grabTilt.angle(90)
+    # sleep(1)
+
+    # grabber.grabTilt.angle(135)
+    # sleep(1)
 
    
-
-    grabber.grabTilt.off()
-    grabber.grabServo.off()
 
 
 if __name__ == '__main__':
