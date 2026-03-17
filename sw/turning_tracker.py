@@ -143,7 +143,7 @@ def run_turning_tracker(
                     sleep(0.1) # might need to adjust
 
                     run_dropoff_tracker(motors, line, grabber, LEFT)
-                    run_return_to_start(motors, line, LEFT)
+                    # run_return_to_start(motors, line, LEFT)
                     break
                 else:
                     print("No reel found")
@@ -161,7 +161,7 @@ def run_turning_tracker(
                     
                     sleep(0.1) # might need to adjust
                     run_dropoff_tracker(motors, line, grabber, RIGHT)
-                    run_return_to_start(motors, line, RIGHT)
+                    # run_return_to_start(motors, line, RIGHT)
                     break
                 else:
                     print("No reel found")
@@ -236,10 +236,13 @@ def run_dropoff_tracker(motors, line: LineSensor, grabber: Grabber, side):
 
                 while ticks_diff(ticks_ms(), start_time) < 700:
                     stop_function()
-
+                grabber.grabServo.angle(160)
                 line.turnLogic(turnDirection=FLIP)
                 while not (line.leftTurn.value() or line.rightTurn.value()):
                     line.lineFollow()
+                motors[LEFT].off()
+                motors[RIGHT].off()
+                sleep(2)
                 break
 
 

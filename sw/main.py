@@ -61,6 +61,11 @@ GRABBER_RESISTANCE_SENSOR_PIN = 28
 GRABBER_GRAB_SERVO_PIN = 15
 GRABBER_TILT_SERVO_PIN = 13
 
+YELLOW_LED_PIN = 16
+RED_LED_PIN = 17
+GREEN_LED_PIN = 18
+BLUE_LED_PIN = 19
+
 
 # memory variables to store state about the mission:
 
@@ -156,9 +161,10 @@ while True:
         if got_out:
             print('free from start box')
             # SIDE A BOTTOM
-            run_turning_tracker(motors=motors, line=line, reel=reel, grabber=grabber, inputRightTurns={2}, inputLeftTurns={1}, inputReelCheckRights=REEL_CHECK_SET)
+            # run_turning_tracker(motors=motors, line=line, reel=reel, grabber=grabber, inputRightTurns={2}, inputLeftTurns={1}, inputReelCheckRights=REEL_CHECK_SET)
+            # line.turnLogic(RIGHT)
             # SIDE B BOTTOM
-            # run_turning_tracker(motors=motors, line=line, reel=reel, grabber=grabber, inputRightTurns={1}, inputLeftTurns={2}, inputReelCheckLefts=REEL_CHECK_SET)
+            run_turning_tracker(motors=motors, line=line, reel=reel, grabber=grabber, inputRightTurns={1}, inputLeftTurns={2}, inputReelCheckLefts=REEL_CHECK_SET)
     except StopRequested:
         print("Stop requested — stopping motors and restarting.")
         stop_motors()

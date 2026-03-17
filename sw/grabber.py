@@ -15,8 +15,14 @@ RED_THRESHOLD = [1800, 1950]
 YELLOW = 3
 YELLOW_THRESHOLD = [200, 400]
 
+YELLOW_LED_PIN = 16
+RED_LED_PIN = 17
+GREEN_LED_PIN = 18
+BLUE_LED_PIN = 19
 
-LED = []
+LED_PIN_LIST = [BLUE_LED_PIN, GREEN_LED_PIN, RED_LED_PIN, YELLOW_LED_PIN]
+
+LED_LIST = [Pin(pin, Pin.OUT, value=0) for pin in LED_PIN_LIST]
 
 BOTTOM_RACK = 0
 TOP_RACK = 1
@@ -88,8 +94,10 @@ class Grabber:
     
     def grabber_align(self,level=TRANSPORT):
         if level == BOTTOM_RACK:
+            self.grabServo.angle(185)
             self.grabTilt.angle(bot_angle)
         elif level == TOP_RACK:
+            self.grabServo.angle(185)
             self.grabTilt.angle(top_angle)
         else:
             self.grabTilt.angle(travel_angle)
@@ -103,11 +111,16 @@ class Grabber:
             # if (self.mvolts >= VOLTAGE_THRESHOLD):
             #     break
             sleep(0.5)
-        # reel_id = self.reel_identifier()
+        reel_id = self.reel_identifier()
+        if reel_id is not None:
+            LED_LIST[reel_id].value(1)
         # return reel_id
     
     def dropoff(self):
-        self.grabServo.angle(185)
+        self.grabServo.angle(180)
+        for led in LED_LIST:
+            led.value(0)
+
 
 
 
@@ -136,6 +149,11 @@ def test_grabber():
     sleep(1)
 
     nice = grabber.reel_identifier()
+    if nice is not None:
+        LED_LIST[nice].value(1)
+        sleep(5)
+        LED_LIST[nice].value(0)
+    
 
     # grabber.grabTilt.angle(90)
     # sleep(1)

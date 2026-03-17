@@ -7,8 +7,7 @@ from pushbutton_logic import stop_function, StopRequested
 from line_logic import LEFT, RIGHT, NO_TURN, T, FORWARD, REVERSE, FLIP
 
 from grabber import TOP_RACK, BOTTOM_RACK, Grabber
-
-THRESHOLD_DIST = 280  # Distance threshold in mm - adjust based on testing
+THRESHOLD_DIST = 285  # Distance threshold in mm - adjust based on testing
 
 
 class ReelSensor:
@@ -21,18 +20,6 @@ class ReelSensor:
         rightI2C = I2C(id=1, sda=Pin(rightReelSDA), scl=Pin(rightReelSCL)) # type: ignore #CHANGE TO ID 1 WHEN OTHER SENSOR CONNECTED
         print("i2c initialised?")
         self.distSensors = [VL53L0X(leftI2C),VL53L0X(rightI2C)]
-        
-        # try:
-        #     # Try to initialize as analog inputs (distance sensors)
-        #     self.leftReelSensor = ADC(Pin(leftReelSensorPin))
-        #     self.rightReelSensor = ADC(Pin(rightReelSensorPin))
-        #     self.is_analog = True
-        #     print("Reel sensors initialized as analog (ADC)")
-        # except:
-        #     # Fallback to digital pins
-        #     self.leftReelSensor = Pin(leftReelSensorPin, Pin.IN)
-        #     self.rightReelSensor = Pin(rightReelSensorPin, Pin.IN)
-        #     print("Reel sensors initialized as digital pins")
 
         for sensor in self.distSensors:
             sensor.set_Vcsel_pulse_period(sensor.vcsel_period_type[0], 18)
@@ -93,7 +80,7 @@ class ReelSensor:
         
         start_time = ticks_ms()
 
-        while ticks_diff(ticks_ms(), start_time) < 600:
+        while ticks_diff(ticks_ms(), start_time) < 700:
             line.lineFollow()
 
         for motor in line.motors:

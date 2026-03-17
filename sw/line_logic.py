@@ -111,7 +111,7 @@ class LineSensor:
                 motors[LEFT].off()
                 motors[RIGHT].off()
                 
-                motors[LEFT].Forward(side=LEFT, speed=60)
+                motors[LEFT].Forward(side=LEFT, speed=50)
                 motors[RIGHT].Reverse(side=RIGHT, speed=60)
 
                 sleep(0.7)
@@ -122,7 +122,7 @@ class LineSensor:
                     sleep(0.1)
 
                 # keep turning until both front sensors are back on the line
-                while not (self.leftOn.value() and self.rightOn.value()):
+                while not (self.leftOn.value() and not self.rightOn.value()):
                     stop_function()
                     sleep(0.1)
 
