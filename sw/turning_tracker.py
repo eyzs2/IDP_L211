@@ -1,5 +1,5 @@
 from utime import sleep, ticks_diff, ticks_ms
-from line_logic import LineSensor, LEFT, RIGHT, NO_TURN, T, FORWARD, REVERSE
+from line_logic import LineSensor, LEFT, RIGHT, NO_TURN, T, FORWARD, REVERSE, FLIP
 # from motor import Motor
 # from start_box import exit_start_box
 # from reelsensor import ReelSensor
@@ -230,11 +230,23 @@ def run_dropoff_tracker(motors, line: LineSensor, grabber: Grabber, side):
                 _stop_motors(motors)
                 print("drop off occurring")
                 grabber.dropoff()
+                start_time = ticks_ms()
+                line.motors[LEFT].Reverse(LEFT, 60)
+                line.motors[RIGHT].Reverse(RIGHT, 60)
+
+                while ticks_diff(ticks_ms(), start_time) < 700:
+                    stop_function()
+
+                line.turnLogic(turnDirection=FLIP)
+                while not (line.leftTurn.value() or line.rightTurn.value()):
+                    line.lineFollow()
                 break
 
 
 
 def run_return_to_start(motors, line: LineSensor, side):
+
+
     left_any_count = 0
     lockout_L = False
     clear_L_start = None
@@ -296,7 +308,7 @@ def run_return_to_start(motors, line: LineSensor, side):
                 _stop_motors(motors)
                 sleep(0.2)
 
-                do_dance(motors)
+    #             # do_dance(motors)
                 break
 
 
