@@ -50,22 +50,3 @@ def exit_start_box(line:LineSensor, motors, motorspeed=40, confirm_ms=120, timeo
     motors[RIGHT].off()
     print("Timeout: Failed to detect line within time limit.")
     return False
-
-# def reel_drop(reel_rack, reel_bay, line: LineSensor, grabber: Grabber):
-    # while True:
-        # stop_function()
-        # line.LineFollow()
-        # if line.turnSense[LEFT].value() and line.turnSense[RIGHT].value():
-            # for motor in line.motors:
-                # motor.off()
-            # grabber.grabServo.angle(200)
-            # while line.turnSense[LEFT].value() or line.turnSense[RIGHT].value():
-            #   stop_function()
-            #   line.LineFollow(REVERSE)
-            # while not line.turnSense[LEFT]:
-            #   stop_function()
-            #   line.LineFollow(REVERSE)
-            # line.turnLogic(LEFT)
-        #      
-
-

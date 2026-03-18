@@ -13,7 +13,7 @@ from line_logic import LineSensor, LEFT, RIGHT, T, NO_TURN
 from start_box import exit_start_box
 from pushbutton_logic import ButtonEdge, request_stop_irq, StopRequested, clear_stop
 # from test_linelogic import lineLogicTest
-from turning_tracker import run_turning_tracker
+from turning_tracker import do_dance, run_turning_tracker
 
 # Mode A = Turn LEFT at first T junction
 # Mode B = Turn RIGHT at first T junction
@@ -166,6 +166,7 @@ while True:
             # SIDE B BOTTOM
             run_turning_tracker(motors=motors, line=line, reel=reel, grabber=grabber, inputRightTurns={1}, inputLeftTurns={2}, inputReelCheckLefts=REEL_CHECK_SET)
             run_turning_tracker(motors=motors, line=line, reel=reel, grabber=grabber, inputLeftTurns={1, 3, 4}, inputRightTurns={2})
+            do_dance(motors)
 
     except StopRequested:
         print("Stop requested — stopping motors and restarting.")
