@@ -164,7 +164,7 @@ while True:
             run_turning_tracker(motors=motors, line=line, reel=reel, grabber=grabber, inputRightTurns={2}, inputLeftTurns={1}, inputReelCheckRights=REEL_CHECK_SET)
             line.turnLogic(RIGHT)
             # SIDE B BOTTOM
-            run_turning_tracker(motors=motors, line=line, reel=reel, grabber=grabber, inputRightTurns={1}, inputLeftTurns={2}, inputReelCheckLefts=REEL_CHECK_SET)
+            run_turning_tracker(motors=motors, line=line, reel=reel, grabber=grabber, inputRightTurns={}, inputLeftTurns={2}, inputReelCheckLefts=REEL_CHECK_SET)
             run_turning_tracker(motors=motors, line=line, reel=reel, grabber=grabber, inputLeftTurns={1, 3, 4}, inputRightTurns={2})
             do_dance(motors)
 

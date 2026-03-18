@@ -7,7 +7,7 @@ from pushbutton_logic import stop_function, StopRequested
 from line_logic import LEFT, RIGHT, NO_TURN, T, FORWARD, REVERSE, FLIP
 
 from grabber import TOP_RACK, BOTTOM_RACK, Grabber
-THRESHOLD_DIST = 285  # Distance threshold in mm - adjust based on testing
+THRESHOLD_DIST = 230  # Distance threshold in mm - adjust based on testing
 
 
 class ReelSensor:
@@ -80,7 +80,7 @@ class ReelSensor:
         
         start_time = ticks_ms()
 
-        while ticks_diff(ticks_ms(), start_time) < 700:
+        while ticks_diff(ticks_ms(), start_time) < 625:
             line.lineFollow()
 
         for motor in line.motors:
@@ -95,7 +95,7 @@ class ReelSensor:
         line.motors[RIGHT].Reverse(RIGHT, 60)
         
 
-        while ticks_diff(ticks_ms(), start_time) < 700:
+        while ticks_diff(ticks_ms(), start_time) < 650:
             stop_function()
 
         grabber.grabber_align()
@@ -109,6 +109,16 @@ class ReelSensor:
         line.motors[LEFT].off()
         line.motors[RIGHT].off()    
         sleep(0.2) # might need to adjust
+
+        # start_time = ticks_ms()
+        # line.motors[LEFT].Reverse(LEFT, 60)
+        # line.motors[RIGHT].Reverse(RIGHT, 60)
+
+        # while ticks_diff(ticks_ms(), start_time) < 400:
+        #     stop_function()
+
+        # line.motors[LEFT].off()
+        # line.motors[RIGHT].off()
 
         print("turned back toward main line")
 

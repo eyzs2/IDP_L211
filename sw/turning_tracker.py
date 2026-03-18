@@ -144,7 +144,7 @@ def run_turning_tracker(
                 _stop_motors(motors)
                 sleep(0.2) # might need to adjust
 
-                if reel.check_reel_detected(LEFT):
+                if reel.check_reel_detected(LEFT) or left_any_count == max(reelCheckLefts):
                     print("REEL DETECTED - starting grab")
                     # reelCheckRights.remove(right_any_count)
                     reel.grab(line, grabber, LEFT)
@@ -163,7 +163,7 @@ def run_turning_tracker(
                 _stop_motors(motors)
                 sleep(0.2) # might need to adjust
 
-                if reel.check_reel_detected(RIGHT):
+                if reel.check_reel_detected(RIGHT) or right_any_count == max(reelCheckRights):
                     print("REEL DETECTED - starting grab")
                     # reelCheckRights.remove(right_any_count)
                     reel.grab(line, grabber, RIGHT)
@@ -251,7 +251,7 @@ def run_dropoff_tracker(motors, line: LineSensor, grabber: Grabber, side):
                     line.lineFollow()
                 motors[LEFT].off()
                 motors[RIGHT].off()
-                sleep(2)
+                sleep(0.5)
                 break
 
 

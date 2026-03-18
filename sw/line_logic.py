@@ -117,12 +117,12 @@ class LineSensor:
                 sleep(0.7)
 
                 print("180 degree turn")
-                while (self.leftOn.value() or self.rightOn.value()):
-                    stop_function()
-                    sleep(0.1)
+                # while (self.leftOn.value() or self.rightOn.value()):
+                #     stop_function()
+                #     sleep(0.1)
 
                 # keep turning until both front sensors are back on the line
-                while not (self.leftOn.value() and not self.rightOn.value()):
+                while not (self.leftOn.value() and self.rightOn.value()):
                     stop_function()
                     sleep(0.1)
 
@@ -145,9 +145,10 @@ class LineSensor:
                     # execute turn based on predetermined outcome (loop)
                     print("turning, ", "type: ", turnDirection)
 
-                    motors[turnDirection].Reverse(side=turnDirection, speed=20)  # change turn speed here as needed
+                    motors[turnDirection].Reverse(side=turnDirection, speed=25)  # change turn speed here as needed
                     motors[(turnDirection+1) % 2].Forward(side=(turnDirection+1) % 2, speed=70)
 
+                    
                     # settle time: don't check sensors yet
                     while (self.lineSense[LEFT].value() or self.lineSense[RIGHT].value()):
                         stop_function()
