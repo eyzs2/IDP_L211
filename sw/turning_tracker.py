@@ -230,8 +230,9 @@ def run_dropoff_tracker(motors, line: LineSensor, grabber: Grabber, side):
 
         if event_fired:
             if t_count == 1:
-                print("first T reached - turning left")
+                print("first T reached - turning")
                 _stop_motors(motors)
+                sleep(1.0)
                 line.turnLogic(turnDirection=((side+1)%2))
                 sleep(0.1)
 

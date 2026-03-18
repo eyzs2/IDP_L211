@@ -122,14 +122,15 @@ class LineSensor:
                 #     sleep(0.1)
 
                 # keep turning until both front sensors are back on the line
-                while not (self.leftOn.value() and self.rightOn.value()):
+                while not (self.leftOn.value() and not self.rightOn.value()):
                     stop_function()
                     sleep(0.1)
 
                 # stop briefly once line is found
                 motors[LEFT].off()
                 motors[RIGHT].off()
-                sleep(0.2) # might need to adjust
+                print('facing out')
+                sleep(1) # might need to adjust
                 return
 
         else:
