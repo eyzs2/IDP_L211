@@ -130,6 +130,15 @@ def run_turning_tracker(
 
         # Print + scheduled turns ONLY when a new event fired 
         if event_fired:
+            if left_any_count in leftTurns and right_any_count in rightTurns:
+                _stop_motors(motors)
+                sleep(0.2) # might need to adjust
+                motors[LEFT].Forward(LEFT, 50)
+                motors[RIGHT].Forward(RIGHT, 50)
+                sleep(1)
+                _stop_motors(motors)
+                break
+
             if left_any_count in reelCheckLefts:
                 print("REEL CHECK at left count: ", left_any_count)
                 _stop_motors(motors)
@@ -149,7 +158,7 @@ def run_turning_tracker(
                     print("No reel found")
                     # reelCheckRights.remove(right_any_count)
                     sleep(0.01)
-            if right_any_count in reelCheckRights:
+            elif right_any_count in reelCheckRights:
                 print("REEL CHECK at right count: ", right_any_count)
                 _stop_motors(motors)
                 sleep(0.2) # might need to adjust
